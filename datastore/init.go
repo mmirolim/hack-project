@@ -1,8 +1,13 @@
 package datastore
 
-import "time"
+import (
+	"time"
+
+	"github.com/mmirolim/hack-project/conf"
+)
 
 type Role int
+type Status int
 
 const (
 	// define const roles
@@ -13,8 +18,22 @@ const (
 	RoleStaff
 	RoleClient
 )
+const (
+	// define const statuses
+	_ Status = iota
+	StatusIssued
+	StatusAccepted
+	StatusInProgress
+	StatusReady
+	StatusPaid
+	StatusCanceled
+)
 
-type User struct {
+func Initialize(ds conf.Datastore) {
+
+}
+
+type Staff struct {
 	ID                    int
 	Login, Password, Name string
 	Role                  Role
@@ -23,11 +42,13 @@ type User struct {
 type Order struct {
 	ID             int
 	Items          []Item
-	Table          Table
+	TableID        int
 	Cost           int
 	PercentService float32
+	Status         Status
 	TotalCost      int
 	Date           time.Time
+	StaffID        int
 }
 
 type Table struct {
