@@ -1,7 +1,6 @@
 package conf
 
 import (
-	"fmt"
 	"strings"
 	"testing"
 )
@@ -11,18 +10,24 @@ func TestRead(t *testing.T) {
 	f := `
 [ds]
 	[ds.sqlite]
-	name = "orders"
+	name = "sqlite3"
+        file = "./foo.db"
+[srv]
+port = "3000"
 `
 	// convert to Reader interface
 	r := strings.NewReader(f)
 	app, err := Read(r)
 	if err != nil {
-		t.Error("Read error")
+		t.Error(err)
 	}
-	fmt.Printf("%+v\n", app)
-	want := "orders"
-	if got := app.DS.SQLite.Name; got != want {
-		t.Errorf("Datastore redis port %d, want %d", got, want)
+	want := "./foo.db"
+	if got := app.DS.SQLite.File; got != want {
+		t.Errorf("SQLite db file %s, want %s", got, want)
+	}
+	want = "3000"
+	if got := app.Srv.Port; got != want {
+		t.Errorf("Server port %s, want %s", got, want)
 	}
 
 }

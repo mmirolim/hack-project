@@ -9,11 +9,17 @@ import (
 type Datastore struct {
 	SQLite struct {
 		Name string
+		File string
 	}
 }
 
+type Server struct {
+	Port string
+}
+
 type App struct {
-	DS Datastore
+	DS  Datastore
+	Srv Server
 }
 
 func Read(r io.Reader) (App, error) {

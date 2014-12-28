@@ -1,0 +1,6 @@
+[ds]
+	[ds.sqlite]
+	name = "sqlite3"
+	file = "./foo.db"
+[srv]
+port = "3000"
