@@ -15,22 +15,29 @@ const (
 )
 
 type User struct {
+	ID                    int
 	Login, Password, Name string
 	Role                  Role
 }
 
 type Order struct {
-	Items []Item
-	Table Table
-	Cost  int
-	Date  time.Time
+	ID             int
+	Items          []Item
+	Table          Table
+	Cost           int
+	PercentService float32
+	TotalCost      int
+	Date           time.Time
 }
 
 type Table struct {
-	ID string
+	ID    int
+	Alias string
 }
 
 type Item struct {
-	Name, Desc string
-	Cost       int
+	ID              int
+	Name, Desc, Img string
+	Serving         float32
+	Cost            int
 }
