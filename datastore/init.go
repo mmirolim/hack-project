@@ -47,7 +47,9 @@ type Order struct {
 	PercentService float32
 	Status         Status
 	TotalCost      int
-	Date           time.Time
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+	ClosedAt       time.Time
 	StaffID        int
 }
 
