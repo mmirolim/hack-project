@@ -55,7 +55,7 @@ type Order struct {
 
 type Table struct {
 	ID    int
-	Alias string
+	Desc, Alias string
 }
 
 type Item struct {
