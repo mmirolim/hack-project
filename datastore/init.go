@@ -9,7 +9,7 @@ import (
 type Role int
 type Status int
 
-var DB gorm.DB
+var DB *gorm.DB
 
 const (
 	// define const roles
@@ -36,7 +36,7 @@ func Initialize(ds conf.Datastore) error {
 	if err != nil {
 		return err
 	}
-
+	DB.DB()
 	DB.CreateTable(&Item{})
 	DB.CreateTable(&Order{})
 	DB.CreateTable(&Staff{})

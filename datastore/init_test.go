@@ -1,7 +1,8 @@
 package datastore
 
 import (
-	"github.com/mmirolim/hack-project/conf"
+	"fmt"
+	"github.com/Maksadbek/hack-project/conf"
 	"log"
 	"strings"
 	"testing"
@@ -27,8 +28,8 @@ func TestInitialize(t *testing.T) {
 		log.Println(err)
 		t.Error(err)
 	}
-
-	err = Initialize(App.DS)
+	fmt.Printf("%+v", App.DS)
+	Initialize(App.DS)
 	if err != nil {
 		log.Println(err)
 		t.Error(err)

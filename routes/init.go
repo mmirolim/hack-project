@@ -18,6 +18,7 @@ func Initialize() *web.Mux {
 	m.Get("/orders/:id", getOrder)
 	m.Post("/orders", createOrder)
 	m.Put("/orders/:id", updateOrder)
+	m.Delete("/delete/:id", deleteOrder)
 	// tables
 	m.Get("/tables", getTablesAll)
 	m.Get("/tables/:id", getTable)
