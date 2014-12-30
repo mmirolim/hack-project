@@ -18,6 +18,7 @@ type Order struct {
 	StaffID        int
 }
 
+/*
 func (order *Order) CreateOrder() {
 	if order.ID == 0 {
 		DB.Create(order)
@@ -42,3 +43,4 @@ func (order Order) UpdateOrder(newOrder Order) {
 func (order Order) DeleteOrder() {
 	DB.Delete(&order)
 }
+*/

@@ -1,7 +1,9 @@
 package datastore
 
 import (
-	"github.com/jinzhu/gorm"
+	"fmt"
+	//"github.com/jinzhu/gorm"
+	"database/sql"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mmirolim/hack-project/conf"
 )
@@ -9,7 +11,7 @@ import (
 type Role int
 type Status int
 
-var DB *gorm.DB
+var DB *sql.DB
 
 const (
 	// define const roles
@@ -31,16 +33,12 @@ const (
 	StatusCanceled
 )
 
-func Initialize(ds conf.Datastore) error {
-	DB, err := gorm.Open(ds.SQLite.Name, ds.SQLite.File)
+func Initialize(ds conf.Datastore) (*sql.DB, error) {
+	DB, err := sql.Open(ds.SQLite.Name, ds.SQLite.File)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	DB.DB()
-	DB.CreateTable(&Item{})
-	DB.CreateTable(&Order{})
-	DB.CreateTable(&Staff{})
-	DB.CreateTable(&Table{})
 
-	return err
+	fmt.Printf("%+v", DB)
+	return DB, err
 }
