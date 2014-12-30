@@ -18,7 +18,7 @@ type Order struct {
 	StaffID        int
 }
 
-func (order Order) CreateOrder() error {
-	db.NewRecord(order)
-	db.Create(&order)
+func (order Order) CreateOrder() {
+	DB.NewRecord(order)
+	DB.Create(&order)
 }
