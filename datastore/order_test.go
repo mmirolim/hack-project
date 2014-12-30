@@ -1,7 +1,7 @@
 package datastore
 
 import (
-	_ "fmt"
+	"fmt"
 	"github.com/mmirolim/hack-project/conf"
 	"log"
 	"strings"
@@ -12,7 +12,6 @@ import (
 func TestOrder(t *testing.T) {
 
 	var osh Item
-	osh.ID = 1
 	osh.Name = "Osh"
 	osh.Desc = "very tasty"
 	osh.Img = "/url/url/url"
@@ -24,7 +23,6 @@ func TestOrder(t *testing.T) {
 	var order Order
 	var items = make([]Item, 1)
 	items[0] = osh
-	order.ID = 1
 	order.Items = items
 	order.TableID = 1
 	order.Cost = 10000
@@ -61,11 +59,9 @@ func TestOrder(t *testing.T) {
 		log.Println(err)
 		t.Error(err)
 	}
+	fmt.Printf("%+v", DB)
 
-	result := order.CreateOrder()
-	if result != true {
-		t.Error("CreateOrder")
-	}
+	order.CreateOrder()
 
 	/*getOrder test
 	var getOrder Order

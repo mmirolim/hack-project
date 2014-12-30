@@ -18,12 +18,11 @@ type Order struct {
 	StaffID        int
 }
 
-func (order Order) CreateOrder() bool {
-	if DB.NewRecord(order) == true {
-		DB.Create(&order)
-		return true
+func (order *Order) CreateOrder() {
+	if order.ID == 0 {
+		DB.Create(order)
+		DB.Save(order)
 	}
-	return false
 }
 
 func (order Order) GetAllOrders() {
