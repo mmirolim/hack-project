@@ -18,6 +18,7 @@ type Order struct {
 	StaffID        int
 }
 
+<<<<<<< Updated upstream
 func (order *Order) CreateOrder() {
 	if order.ID == 0 {
 		DB.Create(order)
@@ -41,4 +42,9 @@ func (order Order) UpdateOrder(newOrder Order) {
 
 func (order Order) DeleteOrder() {
 	DB.Delete(&order)
+=======
+func (order Order) CreateOrder() {
+	DB.NewRecord(order)
+	DB.Create(&order)
+>>>>>>> Stashed changes
 }
