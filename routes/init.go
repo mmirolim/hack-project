@@ -5,9 +5,11 @@ import (
 	"net/http"
 
 	"github.com/zenazn/goji/web"
+
+	ds "github.com/mmirolim/hack-project/datastore"
 )
 
-func Initialize() *web.Mux {
+func Initialize(status <-chan ds.Status) *web.Mux {
 	m := web.New()
 	// show default html
 	m.Get("/", http.FileServer(http.Dir("assets")))

@@ -4,3 +4,9 @@
 	file = "./foo.db"
 [srv]
 port = "3000"
+[rs]
+adaptorname = "raspi"
+botname = "statusbot"
+         [rs.led]
+         name = "led"
+         pin = "7"

@@ -6,7 +6,9 @@ import (
 	"os"
 
 	"github.com/mmirolim/hack-project/conf"
+	ds "github.com/mmirolim/hack-project/datastore"
 	"github.com/mmirolim/hack-project/routes"
+	"github.com/mmirolim/hack-project/services"
 	"github.com/zenazn/goji"
 )
 
@@ -18,8 +20,11 @@ func main() {
 	fatalOnError(err)
 	// close conf file
 	f.Close()
+	// start status bot
+	statusChan := make(chan ds.Status)
+	go services.StartStatusBot(App.Rs, statusChan)
 	// init routes
-	m := routes.Initialize()
+	m := routes.Initialize(statusChan)
 	// set goji server port
 	flag.Set("bind", ":"+App.Srv.Port)
 	// register routes

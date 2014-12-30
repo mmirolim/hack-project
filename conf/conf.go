@@ -17,9 +17,19 @@ type Server struct {
 	Port string
 }
 
+type Raspi struct {
+	AdaptorName string
+	BotName     string
+	Led         struct {
+		Name string
+		Pin  string
+	}
+}
+
 type App struct {
 	DS  Datastore
 	Srv Server
+	Rs  Raspi
 }
 
 func Read(r io.Reader) (App, error) {
