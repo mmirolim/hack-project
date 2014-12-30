@@ -1,13 +1,15 @@
 package datastore
 
 import (
-	"time"
-
+	"github.com/jinzhu/gorm"
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/mmirolim/hack-project/conf"
 )
 
 type Role int
 type Status int
+
+var DB gorm.DB
 
 const (
 	// define const roles
@@ -29,38 +31,16 @@ const (
 	StatusCanceled
 )
 
-func Initialize(ds conf.Datastore) {
+func Initialize(ds conf.Datastore) error {
+	DB, err := gorm.Open(ds.SQLite.Name, ds.SQLite.File)
+	if err != nil {
+		return err
+	}
 
-}
+	DB.CreateTable(&Item{})
+	DB.CreateTable(&Order{})
+	DB.CreateTable(&Staff{})
+	DB.CreateTable(&Table{})
 
-type Staff struct {
-	ID                    int
-	Login, Password, Name string
-	Role                  Role
-}
-
-type Order struct {
-	ID             int
-	Items          []Item
-	TableID        int
-	Cost           int
-	PercentService float32
-	Status         Status
-	TotalCost      int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ClosedAt       time.Time
-	StaffID        int
-}
-
-type Table struct {
-	ID    int
-	Alias string
-}
-
-type Item struct {
-	ID              int
-	Name, Desc, Img string
-	Serving         float32
-	Cost            int
+	return err
 }
