@@ -18,7 +18,28 @@ type Order struct {
 	StaffID        int
 }
 
-func (order Order) CreateOrder() error {
-	db.NewRecord(order)
-	db.Create(&order)
+func (order Order) CreateOrder() bool {
+	if DB.NewRecord(order) == true {
+		DB.Create(&order)
+		return true
+	}
+	return false
+}
+
+func (order Order) GetAllOrders() {
+	DB.Find(&order)
+}
+
+func (order Order) GetOrder(id int) {
+	DB.First(&order, id)
+}
+
+func (order Order) UpdateOrder(newOrder Order) {
+	DB.First(&order, order.ID)
+	order = newOrder
+	DB.Save(&order)
+}
+
+func (order Order) DeleteOrder() {
+	DB.Delete(&order)
 }
