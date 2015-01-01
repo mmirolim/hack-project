@@ -29,6 +29,7 @@ const (
 	StatusAccepted
 	StatusInProgress
 	StatusReady
+	StatusDelivered
 	StatusPaid
 	StatusCanceled
 )
@@ -41,4 +42,27 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 
 	fmt.Printf("%+v", DB)
 	return DB, err
+}
+
+func migrate() {
+	var result sql.Result
+	sqlCreateTableOrders = `
+		CREATE TABLE IF NOT EXISTS orders ( 
+			ID INTEGER PRIMARY	KEY AUTOINCREMENT, 
+			items			TEXT
+			tableID			INTEGER , 
+			cost			INTEGER,
+			percentService	REAL,
+			status			INTEGER,
+			totalCost		INTEGER,
+			createdAt		TEXT,
+			updatedAt		TEXT,
+			closedAt		TEXT
+			staffID			INTEGER
+		)
+		`
+	result, err = db.Exec(sqlCreateTableOrders)
+	if err != nil {
+		return err
+	}
 }

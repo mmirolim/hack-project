@@ -12,7 +12,7 @@ import (
 
 func main() {
 	// read conf file
-	f, err := os.Open("conf.toml")
+	f, err := os.Open("ex-conf.toml")
 	fatalOnError(err)
 	App, err := conf.Read(f)
 	fatalOnError(err)

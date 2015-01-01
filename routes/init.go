@@ -44,6 +44,9 @@ func createOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Create order %s", c.URLParams["id"])
 }
 
+func deleteOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Update order  %s", c.URLParams["id"])
+}
 func updateOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Update order  %s", c.URLParams["id"])
 }

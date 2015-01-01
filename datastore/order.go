@@ -1,6 +1,7 @@
 package datastore
 
 import (
+	"encoding/json"
 	"time"
 )
 
@@ -18,29 +19,81 @@ type Order struct {
 	StaffID        int
 }
 
-/*
-func (order *Order) CreateOrder() {
-	if order.ID == 0 {
-		DB.Create(order)
-		DB.Save(order)
+type Orders []Order
+
+//Create an order
+func (order Order) CreateOrder() error {
+	sql := ` 
+			INSERT INTO orders(
+							id, 
+							items,
+							tableID, 
+							cost, 
+							percentService, 
+							status, 
+							totalCost, 
+							createdAt, 
+							updatedAt, 
+							closedAt, 
+							staffID,
+							items) 
+			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			`
+	items, err := json.Marshal(order.Items)
+	if err != nil {
+		return err
 	}
+	_, err := DB.Exec(sql,
+		order.ID,
+		items,
+		order.TableID,
+		order.Cost,
+		order.PercentService,
+		order.Status,
+		order.TotalCost,
+		order.CreatedAt,
+		order.UpdatedAt,
+		order.ClosedAt,
+		order.StaffID,
+	)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
 
-func (order Order) GetAllOrders() {
-	DB.Find(&order)
-}
+func (order Order) GetAllOrders() error {
+	//var orders Orders
+	getOrdersSQL := `
+			SELECT	
+					id, 
+					tableID, 
+					cost, 
+					percentService, 
+					status, 
+					totalCost, 
+					createdAt, 
+					updatedAt, 
+					closedAt, 
+					staffID
+			FROM orders
+			`
+	rows, err := DB.Query(getOrdersSQL)
+	if err != nil {
+		return err
+	}
+	//i := 0
+	for rows.Next() {
 
+	}
+	return err
+}
 func (order Order) GetOrder(id int) {
-	DB.First(&order, id)
 }
 
 func (order Order) UpdateOrder(newOrder Order) {
-	DB.First(&order, order.ID)
-	order = newOrder
-	DB.Save(&order)
 }
 
-func (order Order) DeleteOrder() {
-	DB.Delete(&order)
+func (order Order) deleteorder() {
 }
-*/
