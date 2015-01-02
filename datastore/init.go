@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"database/sql"
-	"fmt"
 
 	"github.com/mmirolim/hack-project/conf"
 )
@@ -33,6 +32,13 @@ const (
 	StatusCanceled
 )
 
+type Model interface {
+	TableName() string        // get model stored table name
+	createTableQuery() string // get query to create appropriate table
+	SetDefaults()             // set some defaults like dates
+	Validate() error          // @todo refactor
+}
+
 func Initialize(ds conf.Datastore) (*sql.DB, error) {
 	var err error
 	DB, err = sql.Open(ds.SQLite.Name, ds.SQLite.File)
@@ -40,40 +46,23 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 		return nil, err
 	}
 
-	err = Migrate()
+	// create tables for all models if required
+	var order Order
+	var table Table
+	var item Item
+	var staff Staff
+	err = createTable(&order, DB)
+	err = createTable(&table, DB)
+	err = createTable(&item, DB)
+	err = createTable(&staff, DB)
 	if err != nil {
 		return nil, err
 	}
+
 	return DB, err
 }
 
-type Staff struct {
-	ID                    int
-	Login, Password, Name string
-	Role                  Role
-}
-
-func Migrate() error {
-	sqlCreateTableOrders := `
-	CREATE TABLE IF NOT EXISTS orders ( 
-		ID INTEGER PRIMARY	KEY AUTOINCREMENT, 
-		items TEXT, 
-		tableID INTEGER , 
-		cost INTEGER, 
-		percentService REAL, 
-		status INTEGER, 
-		totalCost INTEGER, 
-		createdAt INTEGER, 
-		updatedAt INTEGER, 
-		closedAt INTEGER, 
-		staffID INTEGER
-	)
-	`
-
-	result, err := DB.Exec(sqlCreateTableOrders)
-	if err != nil {
-		return err
-		fmt.Printf("%+v", result)
-	}
+func createTable(m Model, db *sql.DB) error {
+	_, err := db.Exec(m.createTableQuery())
 	return err
 }
