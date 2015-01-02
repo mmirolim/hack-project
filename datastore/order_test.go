@@ -1,8 +1,11 @@
 package datastore
 
 import (
-	"log"
+	"fmt"
+	"github.com/mmirolim/hack-project/conf"
+	"strings"
 	"testing"
+	"time"
 )
 
 func TestCreateOrder(t *testing.T) {
@@ -30,7 +33,7 @@ func TestCreateOrder(t *testing.T) {
 		},
 	}
 	var order Order
-	var status StatusIssued
+	status := StatusIssued
 
 	order.Items = items
 	order.TableID = 2
@@ -41,7 +44,7 @@ func TestCreateOrder(t *testing.T) {
 	order.CreatedAt = time.Now()
 	order.UpdatedAt = time.Now()
 	order.ClosedAt = time.Now()
-	StaffID = 1
+	order.StaffID = 1
 
 	mockConf := `
 [ds]
@@ -56,13 +59,26 @@ func TestCreateOrder(t *testing.T) {
 
 	App, _ := conf.Read(f)
 
-	db, err := Initialize(App.DS)
+	_, err := Initialize(App.DS)
 	if err != nil {
 		t.Error(err)
 	}
 
-	err := CreateOrder(order)
+	err = order.Create()
 	if err != nil {
 		t.Error(err)
 	}
+
+	var orders Orders
+	orders, err = orders.GetAll()
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("%+v\n", orders)
+
+	order, err = order.Get(3)
+	if err != nil {
+		t.Error(err)
+	}
+	fmt.Printf("%+v\n", order)
 }

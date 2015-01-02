@@ -22,10 +22,9 @@ type Order struct {
 type Orders []Order
 
 //Create an order
-func (order Order) CreateOrder() error {
+func (order Order) Create() error {
 	sql := ` 
 			INSERT INTO orders(
-							id, 
 							items,
 							tableID, 
 							cost, 
@@ -35,25 +34,24 @@ func (order Order) CreateOrder() error {
 							createdAt, 
 							updatedAt, 
 							closedAt, 
-							staffID,
-							items) 
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+							staffID
+							) 
+			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
 			`
 	items, err := json.Marshal(order.Items)
 	if err != nil {
 		return err
 	}
-	_, err := DB.Exec(sql,
-		order.ID,
+	_, err = DB.Exec(sql,
 		items,
 		order.TableID,
 		order.Cost,
 		order.PercentService,
 		order.Status,
 		order.TotalCost,
-		order.CreatedAt,
-		order.UpdatedAt,
-		order.ClosedAt,
+		order.CreatedAt.Unix(),
+		order.UpdatedAt.Unix(),
+		order.ClosedAt.Unix(),
 		order.StaffID,
 	)
 	if err != nil {
@@ -63,11 +61,21 @@ func (order Order) CreateOrder() error {
 	return err
 }
 
-func (order Order) GetAllOrders() error {
+func (orders Orders) GetAll() (Orders, error) {
 	//var orders Orders
+	var count int
+	getOrdersCountSQL := "SELECT COUNT() FROM orders"
+
+	rows, err := DB.Query(getOrdersCountSQL)
+	for rows.Next() {
+		rows.Scan(&count)
+	}
+	orders = make(Orders, count)
+	//fmt.Printf("%+v", orders)
 	getOrdersSQL := `
 			SELECT	
 					id, 
+					items,
 					tableID, 
 					cost, 
 					percentService, 
@@ -79,21 +87,93 @@ func (order Order) GetAllOrders() error {
 					staffID
 			FROM orders
 			`
-	rows, err := DB.Query(getOrdersSQL)
+	rows, _ = DB.Query(getOrdersSQL)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	//i := 0
+
+	i := 0
+	var items string
 	for rows.Next() {
+		var createdAt, updatedAt, closedAt int64
+		if err := rows.Scan(
+			&orders[i].ID,
+			&items,
+			&orders[i].TableID,
+			&orders[i].Cost,
+			&orders[i].PercentService,
+			&orders[i].Status,
+			&orders[i].TotalCost,
+			&createdAt,
+			&updatedAt,
+			&closedAt,
+			&orders[i].StaffID,
+		); err != nil {
+			return nil, err
+		}
+		orders[i].CreatedAt = time.Unix(createdAt, 0)
+		orders[i].UpdatedAt = time.Unix(updatedAt, 0)
+		orders[i].ClosedAt = time.Unix(closedAt, 0)
 
+		json.Unmarshal([]byte(items), &orders[i].Items)
+		i += 1
 	}
-	return err
-}
-func (order Order) GetOrder(id int) {
+
+	return orders, err
 }
 
-func (order Order) UpdateOrder(newOrder Order) {
+func (order Order) Get(id int) (Order, error) {
+	getOrderByIDSQL := `
+			SELECT	
+					id, 
+					items,
+					tableID, 
+					cost, 
+					percentService, 
+					status, 
+					totalCost, 
+					createdAt, 
+					updatedAt, 
+					closedAt, 
+					staffID
+			FROM orders
+			WHERE id = ?
+			`
+
+	rows, err := DB.Query(getOrderByIDSQL, id)
+	if err != nil {
+		return order, err
+	}
+
+	var items string
+	for rows.Next() {
+		var createdAt, updatedAt, closedAt int64
+		if err := rows.Scan(
+			&order.ID,
+			&items,
+			&order.TableID,
+			&order.Cost,
+			&order.PercentService,
+			&order.Status,
+			&order.TotalCost,
+			&createdAt,
+			&updatedAt,
+			&closedAt,
+			&order.StaffID,
+		); err != nil {
+			return order, err
+		}
+		order.CreatedAt = time.Unix(createdAt, 0)
+		order.UpdatedAt = time.Unix(updatedAt, 0)
+		order.ClosedAt = time.Unix(closedAt, 0)
+
+		json.Unmarshal([]byte(items), &order.Items)
+	}
+	return order, err
 }
 
-func (order Order) deleteorder() {
+func (order Order) Update(newOrder Order) {
+}
+
+func (order Order) Delete() {
 }
