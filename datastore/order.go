@@ -95,8 +95,7 @@ func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
 	return ords, err
 }
 
-func (o *Order) FindOne(wh Where) (Order, error) {
-	var order Order
-	err := findOne(o, wh, &order)
-	return order, err
+func (o *Order) FindOne(wh Where) error {
+	err := findOne(o, wh, o)
+	return err
 }
