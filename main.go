@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/mmirolim/hack-project/conf"
+	ds "github.com/mmirolim/hack-project/datastore"
 	"github.com/mmirolim/hack-project/routes"
 	"github.com/zenazn/goji"
 )
@@ -18,6 +19,10 @@ func main() {
 	fatalOnError(err)
 	// close conf file
 	f.Close()
+	_, err = ds.Initialize(App.DS)
+	if err != nil {
+		panic(err)
+	}
 	// init routes
 	m := routes.Initialize()
 	// set goji server port

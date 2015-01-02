@@ -2,3 +2,4 @@ conf.toml
 *.*~
 *.swp
 *.db
+req.sh

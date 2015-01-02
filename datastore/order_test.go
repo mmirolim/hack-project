@@ -1,11 +1,13 @@
 package datastore
 
 import (
+	"encoding/json"
 	"fmt"
-	"github.com/mmirolim/hack-project/conf"
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/mmirolim/hack-project/conf"
 )
 
 func TestCreateOrder(t *testing.T) {
@@ -50,7 +52,7 @@ func TestCreateOrder(t *testing.T) {
 [ds]
 	[ds.sqlite]
 	name = "sqlite3"
-	file = "../foo.db"
+	file = "foo.db"
 [srv]
 	port = "3000"
 `
@@ -133,7 +135,8 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Printf("%+v\n", order)
+	orderjson, _ := json.Marshal(order)
+	fmt.Println("----> \n" + string(orderjson))
 }
 
 func TestUpdate(t *testing.T) {
@@ -183,7 +186,7 @@ func TestUpdate(t *testing.T) {
 	}
 
 	//update order
-	err = order.Update(newOrder)
+	err = newOrder.Update(1)
 	if err != nil {
 		t.Error(err)
 	}

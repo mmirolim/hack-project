@@ -172,7 +172,7 @@ func (order Order) Get(id int) (Order, error) {
 	return order, err
 }
 
-func (order Order) Update(newOrder Order) error {
+func (order Order) Update(id int) error {
 	updateOrderSQL := ` UPDATE orders
 						SET	items = ?,
 						tableID = ?,
@@ -185,22 +185,22 @@ func (order Order) Update(newOrder Order) error {
 						staffID=?
 						WHERE id = ?
 						`
-	items, err := json.Marshal(newOrder.Items)
+	items, err := json.Marshal(order.Items)
 	if err != nil {
 		return err
 	}
 
 	_, err = DB.Exec(updateOrderSQL,
 		items,
-		newOrder.TableID,
-		newOrder.PercentService,
-		newOrder.Status,
-		newOrder.TotalCost,
-		newOrder.CreatedAt.Unix(),
-		newOrder.UpdatedAt.Unix(),
-		newOrder.ClosedAt.Unix(),
-		newOrder.StaffID,
-		order.ID,
+		order.TableID,
+		order.PercentService,
+		order.Status,
+		order.TotalCost,
+		order.CreatedAt.Unix(),
+		order.UpdatedAt.Unix(),
+		order.ClosedAt.Unix(),
+		order.StaffID,
+		id,
 	)
 	if err != nil {
 		return err
