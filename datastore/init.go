@@ -83,17 +83,39 @@ func Migrate() error {
 		fmt.Printf("%+v", result)
 	}
 
+	sqlCreateTableStaff := `
+	CREATE TABLE IF NOT EXISTS staff (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		login TEXT,
+		password TEXT,
+		name TEXT,
+		Role INTEGER
+	)
+	`
+
+	result, err = DB.Exec(sqlCreateTableStaff)
+	if err != nil {
+		return err
+		fmt.Printf("%+v", result)
+	}
+
 	return err
 }
 
 func DropTable() error {
 	sqlDropTableOrders := `DROP TABLE orders`
 	sqlDropTableTables := `DROP TABLE tables`
+	sqlDropTableStaff := `DROP TABLE staff`
+
 	_, err := DB.Exec(sqlDropTableOrders)
 	if err != nil {
 		return err
 	}
 	_, err = DB.Exec(sqlDropTableTables)
+	if err != nil {
+		return err
+	}
+	_, err = DB.Exec(sqlDropTableStaff)
 	if err != nil {
 		return err
 	}
