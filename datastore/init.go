@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"database/sql"
+	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/mmirolim/hack-project/conf"
@@ -52,10 +53,7 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 	var table Table
 	var item Item
 	var staff Staff
-	err = createTable(&order, DB)
-	err = createTable(&table, DB)
-	err = createTable(&item, DB)
-	err = createTable(&staff, DB)
+	err = createTable([]Model{&order, &table, &item, &staff})
 	if err != nil {
 		return nil, err
 	}
@@ -63,18 +61,53 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 	return DB, err
 }
 
-func createTable(m Model, db *sql.DB) error {
-	_, err := db.Exec(m.createTableQuery())
+func createTable(ms []Model) error {
+	var err error
+	for _, m := range ms {
+		_, err = DB.Exec(m.createTableQuery())
+	}
 	return err
 }
 
-func FindAll(m Model, limit int, dest interface{}) error {
-	var err error
-
-	return err
+// type for where clause
+type Where struct {
+	Field string
+	Value interface{}
 }
 
-func FindOne(m Model, wh map[string]interface{}, dest interface{}) error {
+func (w *Where) trimSpace() (string, interface{}) {
+	fld := strings.TrimSpace(w.Field)
+	var val interface{}
+	switch v := w.Value.(type) {
+	case string:
+		val = strings.TrimSpace(v)
+	default:
+		val = v
+	}
+	return fld, val
+}
+
+// returns link to result rows by some field
+func findAllRows(m Model, lim int, wh Where) (*sql.Rows, error) {
 	var err error
+	fld, val := wh.trimSpace()
+	if lim == 0 {
+		// protection from abuse
+		lim = 5000
+	}
+	q := "SELECT * FROM " + m.TableName() + " WHERE " + fld + "=? LIMIT ?"
+	rows, err := DB.Query(q, val, lim)
+	return rows, err
+}
+
+// simple find one record by one field
+// @todo refactor to make more flexible
+func findOne(m Model, wh Where, dest interface{}) error {
+	var err error
+	// trim spaces just in case (injection)
+	fld, val := wh.trimSpace()
+	q := "SELECT * FROM " + m.TableName() + " WHERE " + fld + "=? LIMIT 1"
+	// write data to dest
+	err = DB.QueryRow(q, val).Scan(dest)
 	return err
 }

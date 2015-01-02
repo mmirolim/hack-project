@@ -1,6 +1,9 @@
 package datastore
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 type Order struct {
 	ID             int       `db:"id"`
@@ -50,4 +53,50 @@ func (o *Order) SetDefaults() {
 func (o Order) Validate() error {
 	var err error
 	return err
+}
+
+func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
+	ords := []Order{}
+	rows, err := findAllRows(o, lim, wh)
+	// don't forget to close rows
+	defer rows.Close()
+	// temp store for scan
+	var order Order
+	var items string
+	for rows.Next() {
+		var createdAt, updatedAt, closedAt int64
+		err := rows.Scan(
+			&order.ID,
+			&items,
+			&order.TableID,
+			&order.Cost,
+			&order.PercentService,
+			&order.Status,
+			&order.TotalCost,
+			&createdAt,
+			&updatedAt,
+			&closedAt,
+			&order.StaffID,
+		)
+		if err != nil {
+			return ords, err
+		}
+
+		order.CreatedAt = time.Unix(createdAt, 0)
+		order.UpdatedAt = time.Unix(updatedAt, 0)
+		order.ClosedAt = time.Unix(closedAt, 0)
+
+		err = json.Unmarshal([]byte(items), &order.Items)
+		if err != nil {
+			return ords, err
+		}
+		ords = append(ords, order)
+	}
+	return ords, err
+}
+
+func (o *Order) FindOne(wh Where) (Order, error) {
+	var order Order
+	err := findOne(o, wh, &order)
+	return order, err
 }
