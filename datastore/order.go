@@ -172,8 +172,49 @@ func (order Order) Get(id int) (Order, error) {
 	return order, err
 }
 
-func (order Order) Update(newOrder Order) {
+func (order Order) Update(newOrder Order) error {
+	updateOrderSQL := ` UPDATE orders
+						SET	items = ?,
+						tableID = ?,
+						percentService =?,
+						status = ?,
+						totalCost = ?,
+						createdAt=?,
+						updatedAt = ?,
+						closedAt=?,
+						staffID=?
+						WHERE id = ?
+						`
+	items, err := json.Marshal(newOrder.Items)
+	if err != nil {
+		return err
+	}
+
+	_, err = DB.Exec(updateOrderSQL,
+		items,
+		newOrder.TableID,
+		newOrder.PercentService,
+		newOrder.Status,
+		newOrder.TotalCost,
+		newOrder.CreatedAt.Unix(),
+		newOrder.UpdatedAt.Unix(),
+		newOrder.ClosedAt.Unix(),
+		newOrder.StaffID,
+		order.ID,
+	)
+	if err != nil {
+		return err
+	}
+	return err
+
 }
 
-func (order Order) Delete() {
+func (order Order) Delete() error {
+	deleteOrderSQL := "DELETE FROM orders WHERE id = ?"
+	_, err := DB.Exec(deleteOrderSQL, order.ID)
+	if err != nil {
+		return err
+	}
+
+	return err
 }
