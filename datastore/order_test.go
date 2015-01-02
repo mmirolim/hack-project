@@ -165,3 +165,10 @@ func TestDelete(t *testing.T) {
 		t.Error(order)
 	}
 }
+
+func TestDropTable(t *testing.T) {
+	err := DropTable()
+	if err != nil {
+		fmt.Println(err)
+	}
+}

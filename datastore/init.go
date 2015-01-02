@@ -71,3 +71,12 @@ func Migrate() error {
 	}
 	return err
 }
+
+func DropTable() error {
+	sqlDropTable := `DROP TABLE orders`
+	_, err := DB.Exec(sqlDropTable)
+	if err != nil {
+		return err
+	}
+	return err
+}
