@@ -3,6 +3,7 @@ package datastore
 import (
 	"database/sql"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/mmirolim/hack-project/conf"
 )
 
@@ -64,5 +65,16 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 
 func createTable(m Model, db *sql.DB) error {
 	_, err := db.Exec(m.createTableQuery())
+	return err
+}
+
+func FindAll(m Model, limit int, dest interface{}) error {
+	var err error
+
+	return err
+}
+
+func FindOne(m Model, wh map[string]interface{}, dest interface{}) error {
+	var err error
 	return err
 }
