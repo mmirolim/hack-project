@@ -71,9 +71,49 @@ func TestCreateOrder(t *testing.T) {
 }
 
 func TestGetALL(t *testing.T) {
+	items := []Item{
+		{
+			ID:      1,
+			Name:    "Osh",
+			Desc:    "Very tasty",
+			Img:     "/url/",
+			Serving: 123.3,
+			Cost:    12000,
+			Unit:    "portion",
+			Status:  1,
+		},
+
+		{
+			ID:      2,
+			Name:    "Osh",
+			Desc:    "Very tasty",
+			Img:     "/url/",
+			Serving: 123.3,
+			Cost:    12000,
+			Unit:    "portion",
+			Status:  1,
+		},
+	}
+	var order Order
+	status := StatusIssued
+
+	order.Items = items
+	order.TableID = 2
+	order.Cost = 12000
+	order.PercentService = 12.34
+	order.Status = status
+	order.TotalCost = 14000
+	order.CreatedAt = time.Now()
+	order.UpdatedAt = time.Now()
+	order.ClosedAt = time.Now()
+	order.StaffID = 1
+
+	err := order.Create()
+	if err != nil {
+		t.Error(err)
+	}
 	//create array of orders
 	var orders Orders
-	var err error
 
 	//get all orders
 	orders, err = orders.GetAll()
