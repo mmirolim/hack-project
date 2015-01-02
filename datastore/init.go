@@ -1,10 +1,13 @@
 package datastore
 
 import (
-	"time"
+	"database/sql"
+	"fmt"
 
 	"github.com/mmirolim/hack-project/conf"
 )
+
+var DB *sql.DB
 
 type Role int
 type Status int
@@ -25,12 +28,23 @@ const (
 	StatusAccepted
 	StatusInProgress
 	StatusReady
+	StatusDelivered
 	StatusPaid
 	StatusCanceled
 )
 
-func Initialize(ds conf.Datastore) {
+func Initialize(ds conf.Datastore) (*sql.DB, error) {
+	var err error
+	DB, err = sql.Open(ds.SQLite.Name, ds.SQLite.File)
+	if err != nil {
+		return nil, err
+	}
 
+	err = Migrate()
+	if err != nil {
+		return nil, err
+	}
+	return DB, err
 }
 
 type Staff struct {
@@ -39,28 +53,27 @@ type Staff struct {
 	Role                  Role
 }
 
-type Order struct {
-	ID             int
-	Items          []Item
-	TableID        int
-	Cost           int
-	PercentService float32
-	Status         Status
-	TotalCost      int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ClosedAt       time.Time
-	StaffID        int
-}
+func Migrate() error {
+	sqlCreateTableOrders := `
+	CREATE TABLE IF NOT EXISTS orders ( 
+		ID INTEGER PRIMARY	KEY AUTOINCREMENT, 
+		items TEXT, 
+		tableID INTEGER , 
+		cost INTEGER, 
+		percentService REAL, 
+		status INTEGER, 
+		totalCost INTEGER, 
+		createdAt INTEGER, 
+		updatedAt INTEGER, 
+		closedAt INTEGER, 
+		staffID INTEGER
+	)
+	`
 
-type Table struct {
-	ID    int
-	Desc, Alias string
-}
-
-type Item struct {
-	ID              int
-	Name, Desc, Img string
-	Serving         float32
-	Cost            int
+	result, err := DB.Exec(sqlCreateTableOrders)
+	if err != nil {
+		return err
+		fmt.Printf("%+v", result)
+	}
+	return err
 }
