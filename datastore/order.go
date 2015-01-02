@@ -67,6 +67,7 @@ func (orders Orders) GetAll() (Orders, error) {
 	getOrdersCountSQL := "SELECT COUNT() FROM orders"
 
 	rows, err := DB.Query(getOrdersCountSQL)
+	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&count)
 	}
@@ -94,6 +95,7 @@ func (orders Orders) GetAll() (Orders, error) {
 
 	i := 0
 	var items string
+	defer rows.Close()
 	for rows.Next() {
 		var createdAt, updatedAt, closedAt int64
 		if err := rows.Scan(
@@ -146,6 +148,7 @@ func (order Order) Get(id int) (Order, error) {
 	}
 
 	var items string
+	defer rows.Close()
 	for rows.Next() {
 		var createdAt, updatedAt, closedAt int64
 		if err := rows.Scan(

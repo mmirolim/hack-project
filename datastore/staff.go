@@ -32,6 +32,7 @@ func (staffs Staffs) GetAll() (Staffs, error) {
 	getStaffCountSQL := "SELECT COUNT() FROM staff"
 
 	rows, err := DB.Query(getStaffCountSQL)
+	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&count)
 	}
@@ -45,6 +46,7 @@ func (staffs Staffs) GetAll() (Staffs, error) {
 	}
 
 	i := 0
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(
 			&staffs[i].ID,
@@ -78,6 +80,7 @@ func (staff Staff) Get(id int) (Staff, error) {
 		return staff, err
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(
 			&staff.ID,

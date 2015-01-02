@@ -27,6 +27,7 @@ func (tables Tables) GetAll() (Tables, error) {
 	getTablesCountSQL := "SELECT COUNT() FROM tables"
 
 	rows, err := DB.Query(getTablesCountSQL)
+	defer rows.Close()
 	for rows.Next() {
 		rows.Scan(&count)
 	}
@@ -40,6 +41,7 @@ func (tables Tables) GetAll() (Tables, error) {
 	}
 
 	i := 0
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(
 			&tables[i].Alias,
@@ -66,6 +68,7 @@ func (table Table) Get(id int) (Table, error) {
 		return table, err
 	}
 
+	defer rows.Close()
 	for rows.Next() {
 		if err := rows.Scan(
 			&table.ID,
