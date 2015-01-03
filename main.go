@@ -20,6 +20,9 @@ func main() {
 	fatalOnError(err)
 	// close conf file
 	f.Close()
+	// init datastore
+	_, err = ds.Initialize(App.DS)
+	fatalOnError(err)
 	// start status bot
 	statusChan := make(chan ds.Status)
 	go services.StartStatusBot(App.Rs, statusChan)
