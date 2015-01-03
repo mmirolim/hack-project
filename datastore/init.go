@@ -3,6 +3,7 @@ package datastore
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"strconv"
 	"strings"
 
@@ -163,20 +164,22 @@ func create(m Model, args ...interface{}) error {
 	var flds string
 	var qm string
 	for _, f := range m.FieldNames() {
-		f += ", "
-		qm += "?, "
+		f += " ,"
 		flds += f
+		qm += " ?,"
 	}
 	flds = flds[:len(flds)-1]
-	qm = flds[:len(qm)-1]
+	qm = qm[:len(qm)-1]
 	q := "INSERT INTO " +
 		m.TableName() +
 		"( " +
 		flds +
 		" )" +
 		" VALUES( " +
-		flds + ")"
+		qm +
+		")"
 
+	log.Println(q)
 	_, err = DB.Exec(q, args...)
 	return err
 }

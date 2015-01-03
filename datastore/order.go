@@ -180,7 +180,6 @@ func (order *Order) Update() error {
 		order.ClosedAt.Unix(),
 		order.StaffID,
 	)
-
 	return err
 }
 
