@@ -12,7 +12,7 @@ func TestInitialize(t *testing.T) {
 [ds]
 	[ds.sqlite]
 	name = "sqlite3"
-	file = "../foo.db"
+	file = "foo.db"
 [srv]
 	port = "3000"
 `

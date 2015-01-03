@@ -1,7 +1,6 @@
 package datastore
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 	"testing"
@@ -117,13 +116,15 @@ func TestGetALL(t *testing.T) {
 	//create array of orders
 
 	//get all orders
-	orders, err := order.FindAll(Where{Field: "totalCost", Crit: "=", Value: 14000}, 10)
+	_, err = order.FindAll(Where{Field: "totalCost", Crit: "=", Value: 14000}, 10)
 	if err != nil {
 		t.Error(err)
 	}
 
 	//debug
-	fmt.Printf("%+v\n", orders)
+	//	fmt.Println(">>>>>>>>>>>>>>>")
+	//	fmt.Printf("%+v\n", orders)
+	//	fmt.Println("<<<<<<<<<<<<<<<")
 }
 
 func TestGet(t *testing.T) {
@@ -134,86 +135,57 @@ func TestGet(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	orderjson, _ := json.Marshal(order)
-	fmt.Println("------------------->")
-	fmt.Println(string(orderjson))
 }
 
 func TestUpdate(t *testing.T) {
-	status := StatusDelivered
-	items := []Item{
-		{
-			ID:      1,
-			Name:    "Osh",
-			Desc:    "Very tasty",
-			Img:     "/url/",
-			Serving: 123.3,
-			Cost:    12000,
-			Unit:    "portion",
-			Status:  1,
-		},
-
-		{
-			ID:      2,
-			Name:    "Osh",
-			Desc:    "Very tasty",
-			Img:     "/url/",
-			Serving: 123.3,
-			Cost:    12000,
-			Unit:    "portion",
-			Status:  1,
-		},
-	}
 
 	var order Order
-	var newOrder Order
-
-	newOrder.Items = items
-	newOrder.TableID = 5
-	newOrder.Cost = 15000
-	newOrder.PercentService = 34.56
-	newOrder.Status = status
-	newOrder.TotalCost = 18000
-	newOrder.CreatedAt = time.Now()
-	newOrder.UpdatedAt = time.Now()
-	newOrder.ClosedAt = time.Now()
-	newOrder.StaffID = 1
 
 	//get order
-	err := order.FindOne(Where{Field: "ID", Value: 1)
+	err := order.FindOne(Where{Field: "id", Value: 1, Crit: "="})
 	if err != nil {
 		t.Error(err)
 	}
+	fmt.Println(">>>>>>>>>>>>> ORDER FINDONE")
+	fmt.Printf("%+v\n", order)
+	fmt.Println("<<<<<<<<<<<<<")
 
+	order.TableID = 5
 	//update order
-	err = newOrder.Update(1)
+	err = order.Update()
 	if err != nil {
 		t.Error(err)
 	}
 
 	//check updates
-	order, err = order.Get(1)
-	if order.TableID != 5 {
+	err = order.FindOne(Where{Field: "id", Value: 1, Crit: "="})
+	//	fmt.Println(">>>>>>>>>>>>>")
+	//	fmt.Printf("%+v\n", order)
+	//	fmt.Println("<<<<<<<<<<<<<")
+	if err != nil {
+		//		fmt.Println("============")
+		//		fmt.Println(order.TableID)
 		t.Error(err)
 	}
+	fmt.Println(">>>>>>>>>>>>> ORDER UPDATE")
 	fmt.Printf("%+v\n", order)
+	fmt.Println("<<<<<<<<<<<<<")
+	//	fmt.Println(">>>>>>>>>>>>>")
+	//	fmt.Printf("%+v\n", order)
+	//	fmt.Println("<<<<<<<<<<<<<")
 }
 
-/*
 func TestDelete(t *testing.T) {
 	//order is deleted, but order.Get(1) is returns the order
 	var order Order
-	order, err := order.Get(1)
+	err := order.FindOne(Where{Field: "ID", Value: 1, Crit: "="})
+	order.Delete()
+	if err != nil {
+		t.Error(order)
+	}
+	err = order.FindOne(Where{Field: "ID", Value: 2, Crit: "="})
 	order.Delete()
 	if err != nil {
 		t.Error(order)
 	}
 }
-
-func TestDropTable(t *testing.T) {
-	err := DropTable()
-	if err != nil {
-		fmt.Println(err)
-	}
-}
-*/

@@ -2,6 +2,8 @@ package datastore
 
 import (
 	"database/sql"
+	"fmt"
+	"strconv"
 	"strings"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -123,7 +125,6 @@ func findOne(m Model, wh Where, args ...interface{}) error {
 }
 
 func update(m Model, args ...interface{}) error {
-	var err error
 	var flds string
 	id := m.GetID()
 	for _, v := range m.FieldNames() {
@@ -136,10 +137,16 @@ func update(m Model, args ...interface{}) error {
 		m.TableName() +
 		" SET " +
 		flds +
-		" WHERE id = " +
-		string(id)
+		" WHERE id=" +
+		strconv.Itoa(id)
 
-	_, err = DB.Exec(q, args)
+	fmt.Println(">>>>>>>>>>>>>QUERY UPDATE")
+	fmt.Println(q)
+	fmt.Println("<<<<<<<<<<<<<")
+	result, err := DB.Exec(q, args...)
+	fmt.Println(">>>>>>>>>>>>>")
+	fmt.Println(result)
+	fmt.Println("<<<<<<<<<<<<<")
 	return err
 }
 

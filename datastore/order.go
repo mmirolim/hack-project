@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"encoding/json"
-	"fmt"
 	"time"
 )
 
@@ -131,7 +130,6 @@ func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
 	// temp store for scan
 	var order Order
 	var items string
-	fmt.Printf("----->%+v\n<-----------", rows)
 	for rows.Next() {
 		var createdAt, updatedAt, closedAt int64
 		err := rows.Scan(
@@ -160,9 +158,7 @@ func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
 		}
 
 		ords = append(ords, order)
-		fmt.Printf("%+v", order)
 	}
-	fmt.Println(ords)
 	return ords, err
 }
 
@@ -172,9 +168,10 @@ func (order *Order) Update() error {
 		return err
 	}
 
-	update(order,
+	err = update(order,
 		items,
 		order.TableID,
+		order.Cost,
 		order.PercentService,
 		order.Status,
 		order.TotalCost,
@@ -183,16 +180,11 @@ func (order *Order) Update() error {
 		order.ClosedAt.Unix(),
 		order.StaffID,
 	)
-	if err != nil {
-		return err
-	}
+
 	return err
 }
 
 func (order *Order) Delete() error {
 	err := del(order)
-	if err != nil {
-		return err
-	}
 	return err
 }

@@ -1,10 +1,10 @@
 package datastore
 
 import (
-	"fmt"
-	"github.com/mmirolim/hack-project/conf"
 	"strings"
 	"testing"
+
+	"github.com/mmirolim/hack-project/conf"
 )
 
 func TestCreateStaff(t *testing.T) {
@@ -20,7 +20,7 @@ func TestCreateStaff(t *testing.T) {
 [ds]
 	[ds.sqlite]
 	name = "sqlite3"
-	file = "../foo.db"
+	file = "foo.db"
 [srv]
 	port = "3000"
 `
@@ -50,7 +50,7 @@ func TestGetAllStaffs(t *testing.T) {
 	}
 
 	//debug
-	fmt.Printf("%+v\n", staffs)
+	//	fmt.Printf("%+v\n", staffs)
 }
 
 func TestGetStaff(t *testing.T) {
@@ -61,7 +61,7 @@ func TestGetStaff(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	fmt.Printf("%+v\n", staff)
+	//	fmt.Printf("%+v\n", staff)
 }
 
 func TestUpdateStaff(t *testing.T) {
@@ -88,7 +88,7 @@ func TestUpdateStaff(t *testing.T) {
 
 	//check updates
 	staff, err = staff.Get(1)
-	fmt.Printf("%+v\n", staff)
+	//	fmt.Printf("%+v\n", staff)
 }
 
 func TestDeleteStaff(t *testing.T) {
