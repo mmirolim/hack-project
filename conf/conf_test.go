@@ -14,6 +14,13 @@ func TestRead(t *testing.T) {
         file = "./foo.db"
 [srv]
 port = "3000"
+
+[rs]
+adaptorname = "raspi"
+botname = "statusbot"
+         [rs.led]
+         name = "led"
+         pin = "7"
 `
 	// convert to Reader interface
 	r := strings.NewReader(f)
@@ -29,5 +36,13 @@ port = "3000"
 	if got := app.Srv.Port; got != want {
 		t.Errorf("Server port %s, want %s", got, want)
 	}
+	want = "raspi"
+	if got := app.Rs.AdaptorName; got != want {
+		t.Errorf("RasPi led pin %s, want %s", got, want)
+	}
 
+	want = "7"
+	if got := app.Rs.Led.Pin; got != want {
+		t.Errorf("RasPi led pin %s, want %s", got, want)
+	}
 }
