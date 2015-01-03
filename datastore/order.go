@@ -6,152 +6,66 @@ import (
 )
 
 type Order struct {
-	ID             int
-	Items          []Item
-	TableID        int
-	Cost           int
-	PercentService float32
-	Status         Status
-	TotalCost      int
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-	ClosedAt       time.Time
-	StaffID        int
+	ID             int       `db:"id"`
+	Items          []Item    `db:"items"`
+	TableID        int       `db:"tableID"`
+	Cost           int       `db:"cost"`
+	PercentService float32   `db:"percentService"`
+	Status         Status    `db:"status"`
+	TotalCost      int       `db:"totalCost"`
+	CreatedAt      time.Time `db:"createdAt"`
+	UpdatedAt      time.Time `db:"updatedAt"`
+	ClosedAt       time.Time `db:"closedAt"`
+	StaffID        int       `db:"staffID"`
 }
 
-type Orders []Order
+// models table name
+func (o Order) TableName() string {
+	return "orders"
+}
 
-//Create an order
-func (order Order) Create() error {
-	sql := ` 
-			INSERT INTO orders(
-							items,
-							tableID, 
-							cost, 
-							percentService, 
-							status, 
-							totalCost, 
-							createdAt, 
-							updatedAt, 
-							closedAt, 
-							staffID
-							) 
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			`
-	items, err := json.Marshal(order.Items)
-	if err != nil {
-		return err
-	}
-	_, err = DB.Exec(sql,
-		items,
-		order.TableID,
-		order.Cost,
-		order.PercentService,
-		order.Status,
-		order.TotalCost,
-		order.CreatedAt.Unix(),
-		order.UpdatedAt.Unix(),
-		order.ClosedAt.Unix(),
-		order.StaffID,
+// create table query
+func (o Order) createTableQuery() string {
+	q := "CREATE TABLE IF NOT EXISTS " + o.TableName()
+	q += ` ( 
+		id INTEGER PRIMARY	KEY AUTOINCREMENT, 
+		items TEXT, 
+		tableID INTEGER , 
+		cost INTEGER, 
+		percentService REAL, 
+		status INTEGER, 
+		totalCost INTEGER, 
+		createdAt INTEGER, 
+		updatedAt INTEGER, 
+		closedAt INTEGER, 
+		staffID INTEGER
 	)
-	if err != nil {
-		return err
-	}
+	`
+	return q
+}
 
+// defaults to set
+func (o *Order) SetDefaults() {
+	o.CreatedAt = time.Now()
+}
+
+// validation logic for items
+func (o Order) Validate() error {
+	var err error
 	return err
 }
 
-func (orders Orders) GetAll() (Orders, error) {
-	//var orders Orders
-	var count int
-	getOrdersCountSQL := "SELECT COUNT() FROM orders"
-
-	rows, err := DB.Query(getOrdersCountSQL)
+func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
+	ords := []Order{}
+	rows, err := findAllRows(o, lim, wh)
+	// don't forget to close rows
 	defer rows.Close()
-	for rows.Next() {
-		rows.Scan(&count)
-	}
-	orders = make(Orders, count)
-	//fmt.Printf("%+v", orders)
-	getOrdersSQL := `
-			SELECT	
-					id, 
-					items,
-					tableID, 
-					cost, 
-					percentService, 
-					status, 
-					totalCost, 
-					createdAt, 
-					updatedAt, 
-					closedAt, 
-					staffID
-			FROM orders
-			`
-	rows, _ = DB.Query(getOrdersSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	i := 0
+	// temp store for scan
+	var order Order
 	var items string
-	defer rows.Close()
 	for rows.Next() {
 		var createdAt, updatedAt, closedAt int64
-		if err := rows.Scan(
-			&orders[i].ID,
-			&items,
-			&orders[i].TableID,
-			&orders[i].Cost,
-			&orders[i].PercentService,
-			&orders[i].Status,
-			&orders[i].TotalCost,
-			&createdAt,
-			&updatedAt,
-			&closedAt,
-			&orders[i].StaffID,
-		); err != nil {
-			return nil, err
-		}
-		orders[i].CreatedAt = time.Unix(createdAt, 0)
-		orders[i].UpdatedAt = time.Unix(updatedAt, 0)
-		orders[i].ClosedAt = time.Unix(closedAt, 0)
-
-		json.Unmarshal([]byte(items), &orders[i].Items)
-		i += 1
-	}
-
-	return orders, err
-}
-
-func (order Order) Get(id int) (Order, error) {
-	getOrderByIDSQL := `
-			SELECT	
-					id, 
-					items,
-					tableID, 
-					cost, 
-					percentService, 
-					status, 
-					totalCost, 
-					createdAt, 
-					updatedAt, 
-					closedAt, 
-					staffID
-			FROM orders
-			WHERE id = ?
-			`
-
-	rows, err := DB.Query(getOrderByIDSQL, id)
-	if err != nil {
-		return order, err
-	}
-
-	var items string
-	defer rows.Close()
-	for rows.Next() {
-		var createdAt, updatedAt, closedAt int64
-		if err := rows.Scan(
+		err := rows.Scan(
 			&order.ID,
 			&items,
 			&order.TableID,
@@ -163,61 +77,24 @@ func (order Order) Get(id int) (Order, error) {
 			&updatedAt,
 			&closedAt,
 			&order.StaffID,
-		); err != nil {
-			return order, err
+		)
+		if err != nil {
+			return ords, err
 		}
 		order.CreatedAt = time.Unix(createdAt, 0)
 		order.UpdatedAt = time.Unix(updatedAt, 0)
 		order.ClosedAt = time.Unix(closedAt, 0)
 
-		json.Unmarshal([]byte(items), &order.Items)
+		err = json.Unmarshal([]byte(items), &order.Items)
+		if err != nil {
+			return ords, err
+		}
+		ords = append(ords, order)
 	}
-	return order, err
+	return ords, err
 }
 
-func (order Order) Update(id int) error {
-	updateOrderSQL := ` UPDATE orders
-						SET	items = ?,
-						tableID = ?,
-						percentService =?,
-						status = ?,
-						totalCost = ?,
-						createdAt=?,
-						updatedAt = ?,
-						closedAt=?,
-						staffID=?
-						WHERE id = ?
-						`
-	items, err := json.Marshal(order.Items)
-	if err != nil {
-		return err
-	}
-
-	_, err = DB.Exec(updateOrderSQL,
-		items,
-		order.TableID,
-		order.PercentService,
-		order.Status,
-		order.TotalCost,
-		order.CreatedAt.Unix(),
-		order.UpdatedAt.Unix(),
-		order.ClosedAt.Unix(),
-		order.StaffID,
-		id,
-	)
-	if err != nil {
-		return err
-	}
-	return err
-
-}
-
-func (order Order) Delete() error {
-	deleteOrderSQL := "DELETE FROM orders WHERE id = ?"
-	_, err := DB.Exec(deleteOrderSQL, order.ID)
-	if err != nil {
-		return err
-	}
-
+func (o *Order) FindOne(wh Where) error {
+	err := findOne(o, wh, o)
 	return err
 }

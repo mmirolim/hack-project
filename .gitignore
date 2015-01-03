@@ -1,5 +1,9 @@
 conf.toml
 *.*~
+<<<<<<< HEAD
 *.swp
 *.db
 req.sh
+=======
+*.db
+>>>>>>> add-models
