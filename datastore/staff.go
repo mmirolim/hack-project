@@ -23,7 +23,7 @@ func (s Staff) GetID() int {
 }
 
 func (s Staff) FieldNames() []string {
-	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "identity"}
+	return []string{"login", "password", "name", "role", "createdAt", "updatedAt", "identity"}
 }
 
 // create table query
@@ -31,9 +31,9 @@ func (s Staff) createTableQuery() string {
 	q := "CREATE TABLE IF NOT EXISTS " + s.TableName()
 	q += ` ( 
 		id INTEGER PRIMARY	KEY AUTOINCREMENT, 
-		name TEXT, 
 		login TEXT, 
-		password TEXT, 
+		password TEXT,
+                name TEXT, 
                 role INTEGER,
 		createdAt INTEGER, 
 		updatedAt INTEGER, 

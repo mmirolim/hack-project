@@ -47,7 +47,7 @@ func TestCreateStaff(t *testing.T) {
 func TestFindAllStaffs(t *testing.T) {
 	//get all staffs
 	var st Staff
-	stfs, err := st.FindAll(Where{}, 0)
+	stfs, err := st.FindAll(Where{"id", ">", 0}, 0)
 	if err != nil {
 		t.Error(err)
 	}
@@ -86,7 +86,7 @@ func TestUpdateStaff(t *testing.T) {
 	//update staff
 	newSt.Identity = st.Identity
 	newSt.ID = st.ID
-	err = st.Update()
+	err = newSt.Update()
 	if err != nil {
 		t.Error(err)
 	}
@@ -103,7 +103,7 @@ func TestUpdateStaff(t *testing.T) {
 func TestDeleteStaff(t *testing.T) {
 	//staff is deleted, but staff.Get(1) is returns the staff
 	var st Staff
-	err := st.FindOne(Where{"id", ">", 1})
+	err := st.FindOne(Where{"id", ">", 0})
 	reportErr(t, err)
 	err = st.Delete()
 	reportErr(t, err)

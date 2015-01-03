@@ -121,6 +121,7 @@ func findOne(m Model, wh Where, args ...interface{}) error {
 	fld, crit, val := wh.trimSpace()
 	q := "SELECT *  FROM " + m.TableName() + " WHERE " + fld + crit + "? LIMIT 1"
 	// write data to dest
+	fmt.Printf("%+v\n", q)
 	err = DB.QueryRow(q, val).Scan(args...)
 	return err
 }
@@ -141,13 +142,8 @@ func update(m Model, args ...interface{}) error {
 		" WHERE id=" +
 		strconv.Itoa(id)
 
-	fmt.Println(">>>>>>>>>>>>>QUERY UPDATE")
-	fmt.Println(q)
-	fmt.Println("<<<<<<<<<<<<<")
-	result, err := DB.Exec(q, args...)
-	fmt.Println(">>>>>>>>>>>>>")
-	fmt.Println(result)
-	fmt.Println("<<<<<<<<<<<<<")
+	_, err := DB.Exec(q, args...)
+
 	return err
 }
 

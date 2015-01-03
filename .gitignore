@@ -7,3 +7,4 @@ req.sh
 =======
 *.db
 >>>>>>> add-models
+*.test
