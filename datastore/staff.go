@@ -10,6 +10,7 @@ type Staff struct {
 	Role      Role      `db:"role" json:"role"`
 	CreatedAt time.Time `db:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time `db:"updatedAt" json:"updatedAt"`
+	Identity  string    `db:"identity" json:"identity"`
 	StaffID   int       `db:"staffID" json:"staffID"`
 }
 
@@ -23,7 +24,7 @@ func (s Staff) GetID() int {
 }
 
 func (s Staff) FieldNames() []string {
-	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "staffID"}
+	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "identity", "staffID"}
 }
 
 // create table query
@@ -37,6 +38,7 @@ func (s Staff) createTableQuery() string {
                 role INTEGER,
 		createdAt INTEGER, 
 		updatedAt INTEGER, 
+                identity TEXT,
 		staffID INTEGER
 	)
 	`
@@ -54,121 +56,87 @@ func (s Staff) Validate() error {
 	return err
 }
 
-//staff in plural form is also staff, but...
-type Staffs []Staff
-
-//Create a staff
-func (staff Staff) Create() error {
-	sql := ` 
-			INSERT INTO staff(login, password, name, role) VALUES(?,?,?,?)
-			`
-	_, err := DB.Exec(sql,
-		staff.Login,
-		staff.Password,
-		staff.Name,
-		staff.Role,
+//Create an order
+func (st *Staff) Create() error {
+	err := create(st,
+		st.Login,
+		st.Password,
+		st.Name,
+		st.CreatedAt,
+		st.UpdatedAt,
+		st.Identity,
+		st.StaffID,
 	)
-	if err != nil {
-		return err
-	}
+	return err
+}
+
+func (st *Staff) FindOne(wh Where) error {
+	var createdAt, updatedAt int64
+	err := findOne(st, wh, &st.ID,
+		&st.Login,
+		&st.Password,
+		&st.Name,
+		&st.Role,
+		&createdAt,
+		&updatedAt,
+		&st.Identity,
+		&st.StaffID,
+	)
+	st.CreatedAt = time.Unix(createdAt, 0)
+	st.UpdatedAt = time.Unix(updatedAt, 0)
 
 	return err
 }
 
-func (staffs Staffs) GetAll() (Staffs, error) {
-	var count int
-	getStaffCountSQL := "SELECT COUNT() FROM staff"
-
-	rows, err := DB.Query(getStaffCountSQL)
-	defer rows.Close()
-	for rows.Next() {
-		rows.Scan(&count)
-	}
-	staffs = make(Staffs, count)
-	getStaffsSQL := `
-			SELECT id, login, password, name, role FROM staff 
-			`
-	rows, _ = DB.Query(getStaffsSQL)
+func (st *Staff) FindAll(wh Where, lim int) ([]Staff, error) {
+	stfs := []Staff{}
+	rows, err := findAllRows(st, lim, wh)
 	if err != nil {
-		return nil, err
+		return stfs, err
 	}
-
-	i := 0
+	// don't forget to close rows
 	defer rows.Close()
+	// temp store for scan
+	var stf Staff
 	for rows.Next() {
-		if err := rows.Scan(
-			&staffs[i].ID,
-			&staffs[i].Login,
-			&staffs[i].Password,
-			&staffs[i].Name,
-			&staffs[i].Role,
-		); err != nil {
-			return nil, err
+		var createdAt, updatedAt int64
+		err := rows.Scan(
+			&stf.ID,
+			&stf.Login,
+			&stf.Password,
+			&stf.Name,
+			&stf.Role,
+			&createdAt,
+			&updatedAt,
+			&stf.Identity,
+			&stf.StaffID,
+		)
+		if err != nil {
+			return stfs, err
 		}
-		i += 1
+		stf.CreatedAt = time.Unix(createdAt, 0)
+		stf.UpdatedAt = time.Unix(updatedAt, 0)
+		stfs = append(stfs, stf)
 	}
-
-	return staffs, err
+	return stfs, err
 }
 
-func (staff Staff) Get(id int) (Staff, error) {
-	getStaffByIDSQL := `
-			SELECT	
-				id,
-				login,
-				password,
-				name,
-				role
-			FROM staff
-			WHERE id = ?
-			`
-
-	rows, err := DB.Query(getStaffByIDSQL, id)
-	if err != nil {
-		return staff, err
-	}
-
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(
-			&staff.ID,
-			&staff.Login,
-			&staff.Password,
-			&staff.Name,
-			&staff.Role,
-		); err != nil {
-			return staff, err
-		}
-	}
-	return staff, err
-}
-
-func (staff Staff) Update(newStaff Staff) error {
-	updateStaffSQL := ` UPDATE staff 
-						SET	login = ?,
-							password = ?,
-							name = ?,
-							role = ?
-						WHERE id = ?
-						`
-	_, err := DB.Exec(updateStaffSQL,
-		newStaff.Login,
-		newStaff.Password,
-		newStaff.Name,
-		newStaff.Role,
-		staff.ID,
+func (st *Staff) Update() error {
+	err := update(st,
+		st.Login,
+		st.Password,
+		st.Name,
+		st.Role,
+		st.CreatedAt.Unix(),
+		st.UpdatedAt.Unix(),
+		st.Identity,
+		st.StaffID,
 	)
-	if err != nil {
-		return err
-	}
+
 	return err
 }
 
-func (staff Staff) Delete() error {
-	deleteStaffSQL := "DELETE FROM staff WHERE id = ?"
-	_, err := DB.Exec(deleteStaffSQL, staff.ID)
-	if err != nil {
-		return err
-	}
+func (st *Staff) Delete() error {
+	err := del(st)
 	return err
 }
