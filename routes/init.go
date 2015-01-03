@@ -7,7 +7,6 @@ import (
 	"net/http"
 	"strconv"
 
-	ds "github.com/mmirolim/hack-project/datastore"
 	"github.com/zenazn/goji/web"
 
 	ds "github.com/mmirolim/hack-project/datastore"
@@ -40,9 +39,9 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 }
 
 func getOrdersAll(c web.C, w http.ResponseWriter, r *http.Request) {
-	var orders ds.Orders
+	var order ds.Order
 	var err error
-	orders, err = orders.GetAll()
+	orders, err := order.FindAll(ds.Where{}, 0)
 	if err != nil {
 		panic(err)
 	}
@@ -60,7 +59,7 @@ func getOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	var order ds.Order
-	order, err = order.Get(id)
+	err = order.FindOne(ds.Where{"id", "=", id})
 	if err != nil {
 		panic(err)
 	}
@@ -95,7 +94,7 @@ func deleteOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	var order ds.Order
-	order, err = order.Get(id)
+	err = order.FindOne(ds.Where{"id", "=", id})
 	if err != nil {
 		panic(err)
 	}
@@ -120,7 +119,8 @@ func updateOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
-	err = order.Update(id)
+	order.ID = id
+	err = order.Update()
 	if err != nil {
 		panic(err)
 	}
