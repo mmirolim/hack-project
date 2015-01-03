@@ -80,96 +80,83 @@ func (i *Item) Create() error {
 	return err
 }
 
-/*
-func (o *Order) FindOne(wh Where) error {
+func (i *Item) FindOne(wh Where) error {
 	var createdAt, updatedAt, closedAt int64
-	var items string
-	err := findOne(o, wh, &o.ID,
-		&items,
-		&o.TableID,
-		&o.Cost,
-		&o.PercentService,
-		&o.Status,
-		&o.TotalCost,
+	err := findOne(i, wh, &i.ID,
+		&i.Name,
+		&i.Desc,
+		&i.Img,
+		&i.Serving,
+		&i.Cost,
+		&i.Unit,
+		&i.Status,
 		&createdAt,
 		&updatedAt,
-		&closedAt,
-		&o.StaffID,
+		&i.StaffID,
+		&i.CatID,
 	)
-	o.CreatedAt = time.Unix(createdAt, 0)
-	o.UpdatedAt = time.Unix(updatedAt, 0)
-	o.CreatedAt = time.Unix(closedAt, 0)
+	i.CreatedAt = time.Unix(createdAt, 0)
+	i.UpdatedAt = time.Unix(updatedAt, 0)
+	i.CreatedAt = time.Unix(closedAt, 0)
 
 	return err
 }
 
-func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
-	ords := []Order{}
-	rows, err := findAllRows(o, lim, wh)
+func (i *Item) FindAll(wh Where, lim int) ([]Item, error) {
+	itms := []Item{}
+	rows, err := findAllRows(i, lim, wh)
 	if err != nil {
-		return ords, err
+		return itms, err
 	}
 	// don't forget to close rows
 	defer rows.Close()
 	// temp store for scan
-	var order Order
-	var items string
+	var item Item
 	for rows.Next() {
-		var createdAt, updatedAt, closedAt int64
+		var createdAt, updatedAt int64
 		err := rows.Scan(
-			&order.ID,
-			&items,
-			&order.TableID,
-			&order.Cost,
-			&order.PercentService,
-			&order.Status,
-			&order.TotalCost,
+			&item.ID,
+			&item.Name,
+			&item.Desc,
+			&item.Img,
+			&item.Serving,
+			&item.Cost,
+			&item.Unit,
+			&item.Status,
 			&createdAt,
 			&updatedAt,
-			&closedAt,
-			&order.StaffID,
+			&item.StaffID,
+			&item.CatID,
 		)
 		if err != nil {
-			return ords, err
+			return itms, err
 		}
-		order.CreatedAt = time.Unix(createdAt, 0)
-		order.UpdatedAt = time.Unix(updatedAt, 0)
-		order.ClosedAt = time.Unix(closedAt, 0)
+		item.CreatedAt = time.Unix(createdAt, 0)
+		item.UpdatedAt = time.Unix(updatedAt, 0)
 
-		err = json.Unmarshal([]byte(items), &order.Items)
-		if err != nil {
-			return ords, err
-		}
-
-		ords = append(ords, order)
+		itms = append(itms, item)
 	}
-	return ords, err
+	return itms, err
 }
 
-func (order *Order) Update() error {
-	items, err := json.Marshal(order.Items)
-	if err != nil {
-		return err
-	}
-
-	err = update(order,
-		items,
-		order.TableID,
-		order.Cost,
-		order.PercentService,
-		order.Status,
-		order.TotalCost,
-		order.CreatedAt.Unix(),
-		order.UpdatedAt.Unix(),
-		order.ClosedAt.Unix(),
-		order.StaffID,
+func (i *Item) Update() error {
+	err := update(i,
+		i.Name,
+		i.Desc,
+		i.Img,
+		i.Serving,
+		i.Cost,
+		i.Unit,
+		i.Status,
+		i.CreatedAt.Unix(),
+		i.UpdatedAt.Unix(),
+		i.StaffID,
+		i.CatID,
 	)
-
 	return err
 }
 
-func (order *Order) Delete() error {
-	err := del(order)
+func (i *Item) Delete() error {
+	err := del(i)
 	return err
 }
-*/
