@@ -2,6 +2,7 @@ package datastore
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 )
 
@@ -19,12 +20,29 @@ type Order struct {
 	StaffID        int       `db:"staffID"`
 }
 
-// models table name
-func (o Order) TableName() string {
+//Helper methods
+//get ID
+func (order Order) GetID() int {
+	return order.ID
+}
+
+func (order Order) FieldNames() []string {
+	return []string{"items", "tableID", "cost", "percentService", "status", "totalCost", "createdAt", "updatedAt", "closedAt", "staffID"}
+}
+
+func (order *Order) SetDefaults() {
+	order.CreatedAt = time.Now()
+}
+
+func (order Order) Validate() error {
+	var err error
+	return err
+}
+
+func (order Order) TableName() string {
 	return "orders"
 }
 
-// create table query
 func (o Order) createTableQuery() string {
 	q := "CREATE TABLE IF NOT EXISTS " + o.TableName()
 	q += ` ( 
@@ -44,25 +62,76 @@ func (o Order) createTableQuery() string {
 	return q
 }
 
-// defaults to set
-func (o *Order) SetDefaults() {
-	o.CreatedAt = time.Now()
+//Create an order
+func (order Order) Create() error {
+	sql := ` 
+			INSERT INTO orders(
+							items,
+							tableID, 
+							cost, 
+							percentService, 
+							status, 
+							totalCost, 
+							createdAt, 
+							updatedAt, 
+							closedAt, 
+							staffID
+							) 
+			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+			`
+	items, err := json.Marshal(order.Items)
+	if err != nil {
+		return err
+	}
+	_, err = DB.Exec(sql,
+		items,
+		order.TableID,
+		order.Cost,
+		order.PercentService,
+		order.Status,
+		order.TotalCost,
+		order.CreatedAt.Unix(),
+		order.UpdatedAt.Unix(),
+		order.ClosedAt.Unix(),
+		order.StaffID,
+	)
+	return err
 }
 
-// validation logic for items
-func (o Order) Validate() error {
-	var err error
+func (o *Order) FindOne(wh Where) error {
+	var createdAt, updatedAt, closedAt int64
+	var items string
+	err := findOne(o, wh, &o.ID,
+		&items,
+		&o.TableID,
+		&o.Cost,
+		&o.PercentService,
+		&o.Status,
+		&o.TotalCost,
+		&createdAt,
+		&updatedAt,
+		&closedAt,
+		&o.StaffID,
+	)
+	o.CreatedAt = time.Unix(createdAt, 0)
+	o.UpdatedAt = time.Unix(updatedAt, 0)
+	o.CreatedAt = time.Unix(closedAt, 0)
+
 	return err
 }
 
 func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
 	ords := []Order{}
 	rows, err := findAllRows(o, lim, wh)
+	if err != nil {
+		return ords, err
+	}
 	// don't forget to close rows
 	defer rows.Close()
 	// temp store for scan
 	var order Order
 	var items string
+	fmt.Printf("----->%+v\n<-----------", rows)
 	for rows.Next() {
 		var createdAt, updatedAt, closedAt int64
 		err := rows.Scan(
@@ -89,12 +158,41 @@ func (o *Order) FindAll(wh Where, lim int) ([]Order, error) {
 		if err != nil {
 			return ords, err
 		}
+
 		ords = append(ords, order)
+		fmt.Printf("%+v", order)
 	}
+	fmt.Println(ords)
 	return ords, err
 }
 
-func (o *Order) FindOne(wh Where) error {
-	err := findOne(o, wh, o)
+func (order *Order) Update() error {
+	items, err := json.Marshal(order.Items)
+	if err != nil {
+		return err
+	}
+
+	update(order,
+		items,
+		order.TableID,
+		order.PercentService,
+		order.Status,
+		order.TotalCost,
+		order.CreatedAt.Unix(),
+		order.UpdatedAt.Unix(),
+		order.ClosedAt.Unix(),
+		order.StaffID,
+	)
+	if err != nil {
+		return err
+	}
+	return err
+}
+
+func (order *Order) Delete() error {
+	err := del(order)
+	if err != nil {
+		return err
+	}
 	return err
 }

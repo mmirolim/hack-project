@@ -92,10 +92,3 @@ func TestDeleteTable(t *testing.T) {
 		t.Error(table)
 	}
 }
-
-func TestDropTableTables(t *testing.T) {
-	err := DropTable()
-	if err != nil {
-		fmt.Println(err)
-	}
-}

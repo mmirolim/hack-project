@@ -21,6 +21,14 @@ func (it Item) TableName() string {
 	return "items"
 }
 
+func (i Item) FieldNames() []string {
+	return []string{"name", "desc", "img", "serving", "cost", "unit", "status", "createdAt", "updatedAt", "staffID"}
+}
+
+func (i Item) GetID() int {
+	return i.ID
+}
+
 // create table query
 func (it Item) createTableQuery() string {
 	q := "CREATE TABLE IF NOT EXISTS " + it.TableName()

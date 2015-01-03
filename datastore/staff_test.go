@@ -100,10 +100,3 @@ func TestDeleteStaff(t *testing.T) {
 		t.Error(staff)
 	}
 }
-
-func TestDropStaff(t *testing.T) {
-	err := DropTable()
-	if err != nil {
-		fmt.Println(err)
-	}
-}

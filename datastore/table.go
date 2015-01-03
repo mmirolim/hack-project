@@ -11,10 +11,19 @@ type Table struct {
 	UpdatedAt time.Time `db:"updatedAt" json:"updatedAt"`
 	StaffID   int       `db:"staffID" json:"staffID"`
 }
+type Tables []Table
 
 // models table name
 func (t Table) TableName() string {
 	return "tables"
+}
+
+func (t Table) FieldNames() []string {
+	return []string{"alias", "desc", "createdAt", "updatedAt", "staffID"}
+}
+
+func (t Table) GetID() int {
+	return t.ID
 }
 
 // create table query
@@ -136,4 +145,5 @@ func (table Table) Delete() error {
 	if err != nil {
 		return err
 	}
+	return err
 }

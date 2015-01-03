@@ -115,10 +115,9 @@ func TestGetALL(t *testing.T) {
 		t.Error(err)
 	}
 	//create array of orders
-	var orders Orders
 
 	//get all orders
-	orders, err = orders.GetAll()
+	orders, err := order.FindAll(Where{Field: "totalCost", Crit: "=", Value: 14000}, 10)
 	if err != nil {
 		t.Error(err)
 	}
@@ -131,12 +130,13 @@ func TestGet(t *testing.T) {
 	//get order
 	var order Order
 	var err error
-	order, err = order.Get(1)
+	err = order.FindOne(Where{Field: "ID", Value: 1, Crit: "="})
 	if err != nil {
 		t.Error(err)
 	}
 	orderjson, _ := json.Marshal(order)
-	fmt.Println("----> \n" + string(orderjson))
+	fmt.Println("------------------->")
+	fmt.Println(string(orderjson))
 }
 
 func TestUpdate(t *testing.T) {
@@ -180,7 +180,7 @@ func TestUpdate(t *testing.T) {
 	newOrder.StaffID = 1
 
 	//get order
-	order, err := order.Get(1)
+	err := order.FindOne(Where{Field: "ID", Value: 1)
 	if err != nil {
 		t.Error(err)
 	}
@@ -199,6 +199,7 @@ func TestUpdate(t *testing.T) {
 	fmt.Printf("%+v\n", order)
 }
 
+/*
 func TestDelete(t *testing.T) {
 	//order is deleted, but order.Get(1) is returns the order
 	var order Order
@@ -215,3 +216,4 @@ func TestDropTable(t *testing.T) {
 		fmt.Println(err)
 	}
 }
+*/

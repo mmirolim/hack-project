@@ -15,7 +15,15 @@ type Staff struct {
 
 // models table name
 func (s Staff) TableName() string {
-	return "staffs"
+	return "staff"
+}
+
+func (s Staff) GetID() int {
+	return s.ID
+}
+
+func (s Staff) FieldNames() []string {
+	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "staffID"}
 }
 
 // create table query
@@ -162,4 +170,5 @@ func (staff Staff) Delete() error {
 	if err != nil {
 		return err
 	}
+	return err
 }
