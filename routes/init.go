@@ -1,13 +1,19 @@
 package routes
 
 import (
+	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"strconv"
 
+	ds "github.com/mmirolim/hack-project/datastore"
 	"github.com/zenazn/goji/web"
+
+	ds "github.com/mmirolim/hack-project/datastore"
 )
 
-func Initialize() *web.Mux {
+func Initialize(status <-chan ds.Status) *web.Mux {
 	m := web.New()
 	// show default html
 	m.Get("/", http.FileServer(http.Dir("assets")))
@@ -18,11 +24,13 @@ func Initialize() *web.Mux {
 	m.Get("/orders/:id", getOrder)
 	m.Post("/orders", createOrder)
 	m.Put("/orders/:id", updateOrder)
+	m.Delete("/orders/:id", deleteOrder)
 	// tables
 	m.Get("/tables", getTablesAll)
 	m.Get("/tables/:id", getTable)
 	m.Post("/tables", createTable)
 	m.Put("/tables/:id", updateTable)
+	m.Delete("/tables/:id", deleteTable)
 	// users
 	m.Get("/users", getUsersAll)
 	m.Get("/users/:id", getUser)
@@ -32,19 +40,96 @@ func Initialize() *web.Mux {
 }
 
 func getOrdersAll(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "All orders %s", "ORDERS")
+	var orders ds.Orders
+	var err error
+	orders, err = orders.GetAll()
+	if err != nil {
+		panic(err)
+	}
+	ordersJSON, err := json.Marshal(orders)
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "text/json")
+	fmt.Fprintf(w, string(ordersJSON))
 }
 
 func getOrder(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Order %s", c.URLParams["id"])
+	id, err := strconv.Atoi(c.URLParams["id"])
+	if err != nil {
+		panic(err)
+	}
+	var order ds.Order
+	order, err = order.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	orderJSON, _ := json.Marshal(order)
+	w.Header().Set("Content-Type", "text/json")
+	fmt.Fprintf(w, string(orderJSON))
 }
 
 func createOrder(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Create order %s", c.URLParams["id"])
+	var order ds.Order
+
+	decoder := json.NewDecoder(r.Body)
+	log.Println(r.Body)
+	err := decoder.Decode(&order)
+	if err != nil {
+		panic(err)
+	}
+	err = order.Create()
+	if err != nil {
+		panic(err)
+	}
+	orderJSON, err := json.Marshal(order)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprintf(w, string(orderJSON))
 }
 
+func deleteOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(c.URLParams["id"])
+	if err != nil {
+		panic(err)
+	}
+	var order ds.Order
+	order, err = order.Get(id)
+	if err != nil {
+		panic(err)
+	}
+	err = order.Delete()
+	if err != nil {
+		panic(err)
+		fmt.Fprintf(w, "Delete order  %s", false)
+	}
+
+	fmt.Fprintf(w, "Delete order  %s", true)
+}
 func updateOrder(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Update order  %s", c.URLParams["id"])
+	var order ds.Order
+	id, err := strconv.Atoi(c.URLParams["id"])
+	if err != nil {
+		panic(err)
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	log.Println(r.Body)
+	err = decoder.Decode(&order)
+	if err != nil {
+		panic(err)
+	}
+	err = order.Update(id)
+	if err != nil {
+		panic(err)
+	}
+	orderJSON, _ := json.Marshal(&order)
+	if err != nil {
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "text/json")
+	fmt.Fprintf(w, string(orderJSON))
 }
 
 func getTablesAll(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -63,6 +148,9 @@ func updateTable(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Update table  %s", c.URLParams["id"])
 }
 
+func deleteTable(c web.C, w http.ResponseWriter, r *http.Request) {
+	fmt.Fprintf(w, "Delete table  %s", c.URLParams["id"])
+}
 func getUsersAll(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Get all users %s", "Users")
 }
