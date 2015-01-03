@@ -3,18 +3,22 @@ package datastore
 import (
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/mmirolim/hack-project/conf"
 )
 
 func TestCreateStaff(t *testing.T) {
-	var staff Staff
+	var st Staff
 	role := RoleStaff
 
-	staff.Login = "aziza"
-	staff.Password = "password"
-	staff.Name = "Aziza Mominova"
-	staff.Role = role
+	st.Login = "aziza"
+	st.Password = "password"
+	st.Name = "Aziza Mominova"
+	st.Identity = "1234567"
+	st.Role = role
+	st.CreatedAt = time.Now()
+	st.UpdatedAt = time.Now()
 
 	mockConf := `
 [ds]
@@ -34,69 +38,79 @@ func TestCreateStaff(t *testing.T) {
 		t.Error(err)
 	}
 
-	err = staff.Create()
+	err = st.Create()
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestGetAllStaffs(t *testing.T) {
-	var staffs Staffs
-
+func TestFindAllStaffs(t *testing.T) {
 	//get all staffs
-	staffs, err := staffs.GetAll()
+	var st Staff
+	stfs, err := st.FindAll(Where{}, 0)
 	if err != nil {
 		t.Error(err)
 	}
+	if got := stfs[0].Name; got == "" {
+		t.Error("Staff got %s, want %s", got, "not-emtpy")
+	}
 
-	//debug
-	//	fmt.Printf("%+v\n", staffs)
 }
 
-func TestGetStaff(t *testing.T) {
+func TestFindOneStaff(t *testing.T) {
 	//get staff
-	var staff Staff
+	var st Staff
 	var err error
-	staff, err = staff.Get(1)
+	err = st.FindOne(Where{"login", "=", "aziza"})
 	if err != nil {
 		t.Error(err)
 	}
-	//	fmt.Printf("%+v\n", staff)
 }
 
 func TestUpdateStaff(t *testing.T) {
 
-	var staff Staff
-	var newStaff Staff
+	var st Staff
+	var newSt Staff
 
-	newStaff.Login = "Akmal"
-	newStaff.Password = "password"
-	newStaff.Name = "Akmal Ikromov"
-	newStaff.Role = RoleAdmin
+	newSt.Login = "Akmal"
+	newSt.Password = "password"
+	newSt.Name = "Akmal Ikromov"
+	newSt.Role = RoleAdmin
 
 	//get staff
-	staff, err := staff.Get(1)
+	err := st.FindOne(Where{"login", "=", "aziza"})
 	if err != nil {
 		t.Error(err)
 	}
 
 	//update staff
-	err = staff.Update(newStaff)
+	newSt.Identity = st.Identity
+	newSt.ID = st.ID
+	err = st.Update()
 	if err != nil {
 		t.Error(err)
 	}
-
-	//check updates
-	staff, err = staff.Get(1)
-	//	fmt.Printf("%+v\n", staff)
+	// find in db and match with wanted
+	err = st.FindOne(Where{"login", "=", "Akmal"})
+	if err != nil {
+		t.Error(err)
+	}
+	if st.Name != newSt.Name {
+		t.Errorf("Staff Name got %s, want %s", st.Name, newSt.Name)
+	}
 }
 
 func TestDeleteStaff(t *testing.T) {
 	//staff is deleted, but staff.Get(1) is returns the staff
-	var staff Staff
-	staff, err := staff.Get(1)
-	staff.Delete()
+	var st Staff
+	err := st.FindOne(Where{"id", ">", 1})
+	reportErr(t, err)
+	err = st.Delete()
+	reportErr(t, err)
+}
+
+func reportErr(t *testing.T, err error) {
 	if err != nil {
-		t.Error(staff)
+		t.Error(err)
 	}
 }
