@@ -175,10 +175,9 @@ func create(m Model, args ...interface{}) error {
 		flds +
 		" )" +
 		" VALUES( " +
-		flds +
-		")"
+		flds + ")"
 
-	_, err = DB.Exec(q, args)
+	_, err = DB.Exec(q, args...)
 	return err
 }
 

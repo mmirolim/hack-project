@@ -11,7 +11,6 @@ type Staff struct {
 	CreatedAt time.Time `db:"createdAt" json:"createdAt"`
 	UpdatedAt time.Time `db:"updatedAt" json:"updatedAt"`
 	Identity  string    `db:"identity" json:"identity"`
-	StaffID   int       `db:"staffID" json:"staffID"`
 }
 
 // models table name
@@ -24,7 +23,7 @@ func (s Staff) GetID() int {
 }
 
 func (s Staff) FieldNames() []string {
-	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "identity", "staffID"}
+	return []string{"login", "password", "name", "role", "createAt", "updatedAt", "identity"}
 }
 
 // create table query
@@ -38,8 +37,7 @@ func (s Staff) createTableQuery() string {
                 role INTEGER,
 		createdAt INTEGER, 
 		updatedAt INTEGER, 
-                identity TEXT,
-		staffID INTEGER
+                identity TEXT
 	)
 	`
 	return q
@@ -62,10 +60,10 @@ func (st *Staff) Create() error {
 		st.Login,
 		st.Password,
 		st.Name,
-		st.CreatedAt,
-		st.UpdatedAt,
+		st.Role,
+		st.CreatedAt.Unix(),
+		st.UpdatedAt.Unix(),
 		st.Identity,
-		st.StaffID,
 	)
 	return err
 }
@@ -80,7 +78,6 @@ func (st *Staff) FindOne(wh Where) error {
 		&createdAt,
 		&updatedAt,
 		&st.Identity,
-		&st.StaffID,
 	)
 	st.CreatedAt = time.Unix(createdAt, 0)
 	st.UpdatedAt = time.Unix(updatedAt, 0)
@@ -109,7 +106,6 @@ func (st *Staff) FindAll(wh Where, lim int) ([]Staff, error) {
 			&createdAt,
 			&updatedAt,
 			&stf.Identity,
-			&stf.StaffID,
 		)
 		if err != nil {
 			return stfs, err
@@ -130,7 +126,6 @@ func (st *Staff) Update() error {
 		st.CreatedAt.Unix(),
 		st.UpdatedAt.Unix(),
 		st.Identity,
-		st.StaffID,
 	)
 
 	return err
