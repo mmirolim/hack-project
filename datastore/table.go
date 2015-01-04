@@ -45,7 +45,7 @@ func (t *Table) SetDefaults() {
 	t.CreatedAt = time.Now()
 }
 
-// validation logic for items
+// validation logic for tables
 func (t Table) Validate() error {
 	var err error
 	return err
@@ -59,7 +59,6 @@ func (tbl *Table) Create() error {
 		tbl.UpdatedAt.Unix(),
 		tbl.StaffID,
 	)
-
 	return err
 }
 
@@ -85,7 +84,7 @@ func (tbl *Table) FindAll(wh Where, lim int) ([]Table, error) {
 	if err != nil {
 		return tbls, err
 	}
-
+	// don't forget to close rows
 	defer rows.Close()
 	var t Table
 	for rows.Next() {

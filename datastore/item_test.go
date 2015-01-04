@@ -102,3 +102,16 @@ func TestItemUpdate(t *testing.T) {
 
 	log.Printf("%+v\n", item)
 }
+
+func TestDeleteItem(t *testing.T) {
+	//staff is deleted, but staff.Get(1) is returns the staff
+	var item Item
+	err := item.FindOne(Where{"id", ">", 0})
+	if err != nil {
+		t.Error(err)
+	}
+	err = item.Delete()
+	if err != nil {
+		t.Error(err)
+	}
+}

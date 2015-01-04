@@ -103,7 +103,7 @@ func (o *Order) FindOne(wh Where) error {
 	o.CreatedAt = time.Unix(createdAt, 0)
 	o.UpdatedAt = time.Unix(updatedAt, 0)
 	o.CreatedAt = time.Unix(closedAt, 0)
-
+	err = json.Unmarshal([]byte(items), &o.Items)
 	return err
 }
 

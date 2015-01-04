@@ -1,13 +1,11 @@
 package routes
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
 	"github.com/zenazn/goji/web"
-
-	ds "github.com/mmirolim/hack-project/datastore"
+	"net/http"
 )
 
 func getStaffAll(c web.C, w http.ResponseWriter, r *http.Request) {

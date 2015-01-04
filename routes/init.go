@@ -9,6 +9,7 @@ import (
 )
 
 func Initialize(status <-chan ds.Status) *web.Mux {
+	// WARNING more specific routes should be first then more general
 	m := web.New()
 	// show default html
 	m.Get("/", http.FileServer(http.Dir("assets")))
@@ -16,10 +17,12 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	// orders
 	m.Get("/orders", getOrdersAll)
-	m.Get("/orders/:id", getOrder)
 	m.Post("/orders", createOrder)
 	m.Put("/orders/:id", updateOrder)
 	m.Delete("/orders/:id", deleteOrder)
+	m.Get("/orders/status/:status", statusOrder)
+	m.Get("/orders/today", todayOrder)
+	m.Get("/orders/:id", getOrder)
 	// tables
 	m.Get("/tables", getTablesAll)
 	m.Get("/tables/:id", getTable)
