@@ -30,7 +30,7 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Post("/tables", createTable)
 	m.Put("/tables/:id", updateTable)
 	m.Delete("/tables/:id", deleteTable)
-	// users
+	// staff
 	m.Get("/staff", getStaffAll)
 	m.Get("/staff/:id", getStaff)
 	m.Post("/staff", createStaff)
@@ -42,6 +42,8 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Post("/categories", createCat)
 	m.Put("/categories/:id", updateCat)
 	m.Delete("/categories/:id", deleteCat)
+	// notifications
+	m.Get("/notifications/tables/:alias", getTableNots)
 	return m
 }
 

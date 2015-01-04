@@ -61,6 +61,17 @@ func createOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+	// create notifications
+	var not ds.Nots
+	not.TableID = order.TableID
+	not.OrderID = order.ID
+	not.Msg = "You order status"
+	not.Status = int(ds.StatusIssued)
+	not.StaffID = order.StaffID
+	not.CreatedAt = time.Now()
+	not.UpdatedAt = time.Now()
+	err = not.Create()
+	panicOnErr(err)
 	fmt.Fprintf(w, string(orderJSON))
 }
 
@@ -85,37 +96,42 @@ func deleteOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 		}
 		fmt.Fprintf(w, string(result))
 	}
-
-	res := "{'result': 'success'}"
-	result, err := json.Marshal(res)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Fprintf(w, string(result))
+	// @todo don't forget optimize
+	// del all notifications for order
+	var not ds.Nots
+	err = not.FindOne(ds.Where{"orderID", "=", order.ID})
+	panicOnErr(err)
+	err = not.Delete()
+	panicOnErr(err)
+	fmt.Fprintf(w, "Delete order  %s", true)
 }
 func updateOrder(c web.C, w http.ResponseWriter, r *http.Request) {
-	var order ds.Order
 	id, err := strconv.Atoi(c.URLParams["id"])
+	panicOnErr(err)
+	var oldOrd, order ds.Order
+	err = oldOrd.FindOne(ds.Where{"id", "=", id})
+	panicOnErr(err)
 	if err != nil {
 		panic(err)
 	}
 
-	decoder := json.NewDecoder(r.Body)
-	log.Println(r.Body)
-	err = decoder.Decode(&order)
-	if err != nil {
-		panic(err)
-	}
+	err = json.NewDecoder(r.Body).Decode(&order)
+	panicOnErr(err)
 	order.ID = id
 	err = order.Update()
-	if err != nil {
-		panic(err)
+	panicOnErr(err)
+	if oldOrd.Status != order.Status {
+		// if no err update status of notification
+		var not ds.Nots
+		err = not.FindOne(ds.Where{"orderID", "=", order.ID})
+		panicOnErr(err)
+		not.Status = int(order.Status)
+		not.UpdatedAt = time.Now()
+		err = not.Update()
+		panicOnErr(err)
 	}
 	orderJSON, _ := json.Marshal(&order)
-	if err != nil {
-		panic(err)
-	}
-	w.Header().Set("Content-Type", "text/json")
+	panicOnErr(err)
 	fmt.Fprintf(w, string(orderJSON))
 }
 
