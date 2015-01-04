@@ -9,7 +9,7 @@ import (
 	"github.com/mmirolim/hack-project/conf"
 )
 
-func TestCreateItem(t *testing.T) {
+func TestCreateCat(t *testing.T) {
 	mockConf := `
 [ds]
 	[ds.sqlite]
@@ -27,17 +27,11 @@ func TestCreateItem(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	var i Item
+	var i Cat
 	i.Name = "Rollton"
 	i.Desc = "yummy"
-	i.Img = "/img/url"
-	i.Serving = 123.45
-	i.Cost = 1500
-	i.Unit = "litre"
-	i.Status = 3
 	i.UpdatedAt = time.Now()
 	i.StaffID = 2
-	i.CatID = 1
 	i.SetDefaults()
 
 	err = i.Create()
@@ -47,27 +41,21 @@ func TestCreateItem(t *testing.T) {
 
 }
 
-func TestFindOne(t *testing.T) {
-	var i Item
+func TestFindOneCat(t *testing.T) {
+	var i Cat
 	err := i.FindOne(Where{Field: "ID", Value: 1, Crit: "="})
 	if err != nil {
 		t.Error(err)
 	}
 }
 
-func TestFindAll(t *testing.T) {
-	var i Item
+func TestFindAllCat(t *testing.T) {
+	var i Cat
 
 	i.Name = "Rollton"
 	i.Desc = "yummy"
-	i.Img = "/img/url"
-	i.Serving = 123.45
-	i.Cost = 1500
-	i.Unit = "litre"
-	i.Status = 3
 	i.UpdatedAt = time.Now()
 	i.StaffID = 2
-	i.CatID = 1
 	i.SetDefaults()
 
 	err := i.Create()
@@ -81,36 +69,36 @@ func TestFindAll(t *testing.T) {
 	}
 }
 
-func TestItemUpdate(t *testing.T) {
-	var item Item
-	err := item.FindOne(Where{Field: "id", Value: 1, Crit: "="})
+func TestCatUpdateCat(t *testing.T) {
+	var cat Cat
+	err := cat.FindOne(Where{Field: "id", Value: 1, Crit: "="})
 	if err != nil {
 		t.Error(err)
 	}
 
-	item.CatID = 15
+	cat.Name = "Bigbon"
 
-	err = item.Update()
+	err = cat.Update()
 	if err != nil {
 		t.Error(err)
 	}
 
-	err = item.FindOne(Where{Field: "id", Value: 1, Crit: "="})
+	err = cat.FindOne(Where{Field: "id", Value: 1, Crit: "="})
 	if err != nil {
 		t.Error(err)
 	}
 
-	log.Printf("%+v\n", item)
+	log.Printf("%+v\n", cat)
 }
 
-func TestDeleteItem(t *testing.T) {
+func TestDeleteCat(t *testing.T) {
 	//staff is deleted, but staff.Get(1) is returns the staff
-	var item Item
-	err := item.FindOne(Where{"id", ">", 0})
+	var cat Cat
+	err := cat.FindOne(Where{"id", ">", 0})
 	if err != nil {
 		t.Error(err)
 	}
-	err = item.Delete()
+	err = cat.Delete()
 	if err != nil {
 		t.Error(err)
 	}
