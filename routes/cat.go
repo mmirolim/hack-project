@@ -42,7 +42,23 @@ func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Update user %s", c.URLParams["id"])
+	id, err := strconv.Atoi(c.URLParams["id"])
+	panicOnErr(err)
+	var oldCat, cat ds.Cat
+	err = oldCat.FindOne(ds.Where{"id", "=", id})
+	panicOnErr(err)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.NewDecoder(r.Body).Decode(&cat)
+	panicOnErr(err)
+	cat.ID = id
+	err = cat.Update()
+	panicOnErr(err)
+	orderJSON, _ := json.Marshal(&cat)
+	panicOnErr(err)
+	fmt.Fprintf(w, string(orderJSON))
 }
 
 func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
