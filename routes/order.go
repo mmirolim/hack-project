@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/zenazn/goji/web"
-
 	ds "github.com/mmirolim/hack-project/datastore"
+	"github.com/zenazn/goji/web"
 )
 
 func getOrdersAll(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -47,6 +46,7 @@ func getOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 func createOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	var order ds.Order
 
+	order.SetDefaults()
 	decoder := json.NewDecoder(r.Body)
 	log.Println(r.Body)
 	err := decoder.Decode(&order)
@@ -86,9 +86,15 @@ func deleteOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 	err = order.Delete()
+	w.Header().Set("Content-Type", "text/json")
 	if err != nil {
 		panic(err)
-		fmt.Fprintf(w, "Delete order  %s", false)
+		res := "{'result': 'failure'}"
+		result, err := json.Marshal(res)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Fprintf(w, string(result))
 	}
 	// @todo don't forget optimize
 	// del all notifications for order
@@ -127,4 +133,58 @@ func updateOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	orderJSON, _ := json.Marshal(&order)
 	panicOnErr(err)
 	fmt.Fprintf(w, string(orderJSON))
+}
+
+func statusOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	var order ds.Order
+	status, err := strconv.Atoi(c.URLParams["status"])
+	fmt.Println(status)
+	if err != nil {
+		panic(err)
+	}
+	orders, err := order.FindAll(ds.Where{
+		Field: "status",
+		Crit:  " = ",
+		Value: status}, 10)
+
+	fmt.Println(orders)
+	if err != nil {
+		panic(err)
+	}
+	ordersJSON, err := json.Marshal(orders)
+	if err != nil {
+		panic(err)
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	fmt.Fprintf(w, string(ordersJSON))
+}
+
+func todayOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	now := time.Now()
+	t := time.Date(now.Year(), now.Month(), now.Day(), 00, 0, 0, 0, time.UTC)
+	today := int(t.Unix())
+
+	var order ds.Order
+	orders, err := order.FindAll(ds.Where{Field: "createdAt", Crit: ">", Value: today}, 10)
+	ordersJSON, err := json.Marshal(orders)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Fprintf(w, string(ordersJSON))
+}
+
+func activeOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	_, err := strconv.Atoi(c.URLParams["alias"])
+	panicOnErr(err)
+
+	var order ds.Order
+	orders, err := order.FindAll(ds.Where{Field: "status", Crit: "!=", Value: ds.StatusPaid}, 0)
+
+	ordersJSON, err := json.Marshal(orders)
+	panicOnErr(err)
+
+	w.Header().Set("Content-type", "application/json")
+
+	fmt.Fprintf(w, string(ordersJSON))
 }

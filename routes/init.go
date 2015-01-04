@@ -9,6 +9,7 @@ import (
 )
 
 func Initialize(status <-chan ds.Status) *web.Mux {
+	// WARNING more specific routes should be first then more general
 	m := web.New()
 	// show default html
 	m.Get("/", http.FileServer(http.Dir("assets")))
@@ -16,10 +17,13 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Get("/assets/*", http.StripPrefix("/assets/", http.FileServer(http.Dir("assets"))))
 	// orders
 	m.Get("/orders", getOrdersAll)
-	m.Get("/orders/:id", getOrder)
 	m.Post("/orders", createOrder)
-	m.Put("/orders/:id", updateOrder)
+	m.Get("/orders/active/table/:alias", activeOrder)
+	m.Get("/orders/status/:status", statusOrder)
+	m.Get("/orders/today", todayOrder)
+	m.Get("/orders/:id", getOrder)
 	m.Delete("/orders/:id", deleteOrder)
+	m.Put("/orders/:id", updateOrder)
 	// tables
 	m.Get("/tables", getTablesAll)
 	m.Get("/tables/:id", getTable)
@@ -31,6 +35,13 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Get("/staff/:id", getStaff)
 	m.Post("/staff", createStaff)
 	m.Put("/staff/:id", updateStaff)
+
+	//categories
+	m.Get("/categories", getCatAll)
+	m.Get("/categories/:id", getCat)
+	m.Post("/categories", createCat)
+	m.Put("/categories/:id", updateCat)
+	m.Delete("/categories/:id", deleteCat)
 	// notifications
 	m.Get("/notifications/tables/:alias", getTableNots)
 	return m
