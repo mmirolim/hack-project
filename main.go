@@ -31,7 +31,7 @@ func main() {
 	// set response format
 	//	goji.Use(routes.JSON)
 	// set goji server port
-	flag.Set("bind", ":"+App.Srv.Port)
+	flag.Set("bind", App.Srv.IP+":"+App.Srv.Port)
 	// register routes
 	goji.Handle("/*", m)
 	// start server
