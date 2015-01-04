@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/zenazn/goji/web"
-
 	ds "github.com/mmirolim/hack-project/datastore"
+	"github.com/zenazn/goji/web"
 )
 
 func getStaffAll(c web.C, w http.ResponseWriter, r *http.Request) {
