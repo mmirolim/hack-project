@@ -18,11 +18,12 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	// orders
 	m.Get("/orders", getOrdersAll)
 	m.Post("/orders", createOrder)
-	m.Put("/orders/:id", updateOrder)
-	m.Delete("/orders/:id", deleteOrder)
+	m.Get("/orders/active/table/:alias", activeOrder)
 	m.Get("/orders/status/:status", statusOrder)
 	m.Get("/orders/today", todayOrder)
 	m.Get("/orders/:id", getOrder)
+	m.Delete("/orders/:id", deleteOrder)
+	m.Put("/orders/:id", updateOrder)
 	// tables
 	m.Get("/tables", getTablesAll)
 	m.Get("/tables/:id", getTable)

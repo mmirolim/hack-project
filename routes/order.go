@@ -158,9 +158,17 @@ func todayOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, string(ordersJSON))
 }
 
-func statusOrder(c web.C, w http.ResponseWriter, r *http.Request) {
-	status, err := strconv.Atoi(c.URLParams["id"])
+func activeOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	_, err := strconv.Atoi(c.URLParams["alias"])
 	panicOnErr(err)
-	var order Order
-	orders, err := order.FindAll(ds.Where{Field: "status", Crit: "=", Value: kk
+
+	var order ds.Order
+	orders, err := order.FindAll(ds.Where{Field: "status", Crit: "!=", Value: ds.StatusPaid}, 0)
+
+	ordersJSON, err := json.Marshal(orders)
+	panicOnErr(err)
+
+	w.Header().Set("Content-type", "application/json")
+
+	fmt.Fprintf(w, string(ordersJSON))
 }
