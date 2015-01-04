@@ -11,7 +11,6 @@ type Table struct {
 	UpdatedAt time.Time `db:"updatedAt" json:"updatedAt"`
 	StaffID   int       `db:"staffID" json:"staffID"`
 }
-type Tables []Table
 
 // models table name
 func (t Table) TableName() string {
@@ -52,98 +51,76 @@ func (t Table) Validate() error {
 	return err
 }
 
-func (table Table) Create() error {
-	sql := ` 
-			INSERT INTO tables(alias) VALUES(?)
-			`
-	_, err := DB.Exec(sql,
-		table.Alias,
+func (tbl *Table) Create() error {
+	err := create(tbl,
+		tbl.Alias,
+		tbl.Desc,
+		tbl.CreatedAt.Unix(),
+		tbl.UpdatedAt.Unix(),
+		tbl.StaffID,
 	)
-	if err != nil {
-		return err
-	}
 
 	return err
 }
 
-func (tables Tables) GetAll() (Tables, error) {
-	var count int
-	getTablesCountSQL := "SELECT COUNT() FROM tables"
-
-	rows, err := DB.Query(getTablesCountSQL)
-	defer rows.Close()
-	for rows.Next() {
-		rows.Scan(&count)
-	}
-	tables = make(Tables, count)
-	getTablesSQL := `
-			SELECT alias FROM tables 
-			`
-	rows, _ = DB.Query(getTablesSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	i := 0
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(
-			&tables[i].Alias,
-		); err != nil {
-			return nil, err
-		}
-		i += 1
-	}
-
-	return tables, err
-}
-
-func (table Table) Get(id int) (Table, error) {
-	getTableByIDSQL := `
-			SELECT	
-					id, 
-					alias
-			FROM tables
-			WHERE id = ?
-			`
-
-	rows, err := DB.Query(getTableByIDSQL, id)
-	if err != nil {
-		return table, err
-	}
-
-	defer rows.Close()
-	for rows.Next() {
-		if err := rows.Scan(
-			&table.ID,
-			&table.Alias,
-		); err != nil {
-			return table, err
-		}
-	}
-	return table, err
-}
-
-func (table Table) Update(newTable Table) error {
-	updateTableSQL := ` UPDATE tables 
-						SET	alias = ?
-						WHERE id = ?
-						`
-	_, err := DB.Exec(updateTableSQL,
-		newTable.Alias,
-		table.ID,
+func (tbl *Table) FindOne(wh Where) error {
+	var createdAt, updatedAt int64
+	err := findOne(tbl, wh,
+		&tbl.ID,
+		&tbl.Alias,
+		&tbl.Desc,
+		&createdAt,
+		&updatedAt,
+		&tbl.StaffID,
 	)
-	if err != nil {
-		return err
-	}
+	tbl.CreatedAt = time.Unix(createdAt, 0)
+	tbl.UpdatedAt = time.Unix(updatedAt, 0)
+
 	return err
 }
 
-func (table Table) Delete() error {
-	deleteTableSQL := "DELETE FROM tables WHERE id = ?"
-	_, err := DB.Exec(deleteTableSQL, table.ID)
+func (tbl *Table) FindAll(wh Where, lim int) ([]Table, error) {
+	tbls := []Table{}
+	rows, err := findAllRows(tbl, lim, wh)
 	if err != nil {
-		return err
+		return tbls, err
 	}
+
+	defer rows.Close()
+	var t Table
+	for rows.Next() {
+		var createdAt, updatedAt int64
+		err := rows.Scan(
+			&t.ID,
+			&t.Alias,
+			&t.Desc,
+			&createdAt,
+			&updatedAt,
+			&t.StaffID,
+		)
+		if err != nil {
+			return tbls, err
+		}
+		t.CreatedAt = time.Unix(createdAt, 0)
+		t.UpdatedAt = time.Unix(updatedAt, 0)
+		tbls = append(tbls, t)
+	}
+
+	return tbls, err
+}
+
+func (tbl *Table) Update() error {
+	err := update(tbl,
+		tbl.Alias,
+		tbl.Desc,
+		tbl.CreatedAt.Unix(),
+		tbl.UpdatedAt.Unix(),
+		tbl.StaffID,
+	)
+	return err
+}
+
+func (tbl *Table) Delete() error {
+	err := del(tbl)
 	return err
 }
