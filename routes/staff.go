@@ -3,7 +3,6 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/zenazn/goji/web"
@@ -27,18 +26,12 @@ func getStaff(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func createStaff(c web.C, w http.ResponseWriter, r *http.Request) {
-	//var st ds.Staff
-	var st map[string]interface{}
-	data, err := ioutil.ReadAll(r.Body)
-	if err == nil && data != nil {
-		fmt.Printf("%+v\n", data)
-		err = json.Unmarshal(data, &st)
-	}
-	fmt.Printf("%+v\n", st)
+	var st ds.Staff
+	err := json.NewDecoder(r.Body).Decode(&st)
 	panicOnErr(err)
 	fmt.Printf("%+v\n", st)
-	//err = st.Create()
-	//panicOnErr(err)
+	err = st.Create()
+	panicOnErr(err)
 	fmt.Fprintf(w, "success")
 }
 

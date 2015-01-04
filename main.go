@@ -29,7 +29,7 @@ func main() {
 	// init routes
 	m := routes.Initialize(statusChan)
 	// set response format
-	goji.Use(routes.JSON)
+	//	goji.Use(routes.JSON)
 	// set goji server port
 	flag.Set("bind", ":"+App.Srv.Port)
 	// register routes
