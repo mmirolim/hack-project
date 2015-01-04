@@ -1,11 +1,7 @@
 package routes
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/zenazn/goji/web"
 
@@ -31,9 +27,24 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Put("/tables/:id", updateTable)
 	m.Delete("/tables/:id", deleteTable)
 	// users
-	m.Get("/staff", getStaffsAll)
+	m.Get("/staff", getStaffAll)
 	m.Get("/staff/:id", getStaff)
 	m.Post("/staff", createStaff)
 	m.Put("/staff/:id", updateStaff)
 	return m
+}
+
+func panicOnErr(err error) {
+	if err != nil {
+		panic(err)
+	}
+}
+
+// set response to json format
+func JSON(h http.Handler) http.Handler {
+	fn := func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		h.ServeHTTP(w, r)
+	}
+	return http.HandlerFunc(fn)
 }

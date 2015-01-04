@@ -3,9 +3,7 @@ package routes
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/zenazn/goji/web"
 
@@ -13,7 +11,11 @@ import (
 )
 
 func getTablesAll(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Get all tables %s", "Tables")
+	var tbl ds.Table
+	tbls, err := tbl.FindAll(ds.Where{"id", ">", 0}, 0)
+	panicOnErr(err)
+	jsn, err := json.Marshal(tbls)
+	fmt.Fprintf(w, string(jsn))
 }
 
 func getTable(c web.C, w http.ResponseWriter, r *http.Request) {

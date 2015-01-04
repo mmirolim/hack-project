@@ -6,17 +6,17 @@ import (
 )
 
 type Order struct {
-	ID             int       `db:"id"`
-	Items          []Item    `db:"items"`
-	TableID        int       `db:"tableID"`
-	Cost           int       `db:"cost"`
-	PercentService float32   `db:"percentService"`
-	Status         Status    `db:"status"`
-	TotalCost      int       `db:"totalCost"`
-	CreatedAt      time.Time `db:"createdAt"`
-	UpdatedAt      time.Time `db:"updatedAt"`
-	ClosedAt       time.Time `db:"closedAt"`
-	StaffID        int       `db:"staffID"`
+	ID             int       `db:"id" json:"id"`
+	Items          []Item    `db:"items" json:"items"`
+	TableID        int       `db:"tableID" json:"tableID"`
+	Cost           int       `db:"cost" json:"cost"`
+	PercentService float32   `db:"percentService" json:"percentService"`
+	Status         Status    `db:"status" json:"status"`
+	TotalCost      int       `db:"totalCost" json:"totalCost"`
+	CreatedAt      time.Time `db:"createdAt" json:"createdAt"`
+	UpdatedAt      time.Time `db:"updatedAt" json:"updatedAt"`
+	ClosedAt       time.Time `db:"closedAt" json:"closedAt"`
+	StaffID        int       `db:"staffID" json:"staffID"`
 }
 
 //Helper methods
@@ -62,37 +62,25 @@ func (o Order) createTableQuery() string {
 }
 
 //Create an order
-func (order Order) Create() error {
-	sql := ` 
-			INSERT INTO orders(
-							items,
-							tableID, 
-							cost, 
-							percentService, 
-							status, 
-							totalCost, 
-							createdAt, 
-							updatedAt, 
-							closedAt, 
-							staffID
-							) 
-			VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-			`
-	items, err := json.Marshal(order.Items)
+func (o *Order) Create() error {
+	o.SetDefaults()
+	o.UpdatedAt = time.Now()
+	// marshal items
+	items, err := json.Marshal(o.Items)
 	if err != nil {
 		return err
 	}
-	_, err = DB.Exec(sql,
-		items,
-		order.TableID,
-		order.Cost,
-		order.PercentService,
-		order.Status,
-		order.TotalCost,
-		order.CreatedAt.Unix(),
-		order.UpdatedAt.Unix(),
-		order.ClosedAt.Unix(),
-		order.StaffID,
+	err = create(o,
+		string(items),
+		o.TableID,
+		o.Cost,
+		o.PercentService,
+		o.Status,
+		o.TotalCost,
+		o.CreatedAt.Unix(),
+		o.UpdatedAt.Unix(),
+		o.ClosedAt.Unix(),
+		o.StaffID,
 	)
 	return err
 }

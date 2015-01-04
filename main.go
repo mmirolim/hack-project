@@ -28,6 +28,8 @@ func main() {
 	go services.StartStatusBot(App.Rs, statusChan)
 	// init routes
 	m := routes.Initialize(statusChan)
+	// set response format
+	goji.Use(routes.JSON)
 	// set goji server port
 	flag.Set("bind", ":"+App.Srv.Port)
 	// register routes

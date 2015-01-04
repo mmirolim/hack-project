@@ -56,6 +56,8 @@ func (s Staff) Validate() error {
 
 //Create an order
 func (st *Staff) Create() error {
+	st.SetDefaults()
+	st.UpdatedAt = time.Now()
 	err := create(st,
 		st.Login,
 		st.Password,
