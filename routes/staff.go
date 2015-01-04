@@ -14,9 +14,7 @@ func getStaffAll(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Staff
 	var err error
 	sts, err := st.FindAll(ds.Where{"id", ">", 0}, 0)
-	if err != nil {
-		panic(err)
-	}
+	panicOnErr(err)
 	jsn, err := json.Marshal(sts)
 	fmt.Fprintf(w, string(jsn))
 }

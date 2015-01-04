@@ -26,11 +26,13 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Post("/tables", createTable)
 	m.Put("/tables/:id", updateTable)
 	m.Delete("/tables/:id", deleteTable)
-	// users
+	// staff
 	m.Get("/staff", getStaffAll)
 	m.Get("/staff/:id", getStaff)
 	m.Post("/staff", createStaff)
 	m.Put("/staff/:id", updateStaff)
+	// notifications
+	m.Get("/notifications/tables/:alias", getTableNots)
 	return m
 }
 
