@@ -52,7 +52,7 @@ func TestFindAllStaffs(t *testing.T) {
 		t.Error(err)
 	}
 	if got := stfs[0].Name; got == "" {
-		t.Error("Staff got %s, want %s", got, "not-emtpy")
+		t.Errorf("Staff got %s, want %s", got, "not-emtpy")
 	}
 
 }
