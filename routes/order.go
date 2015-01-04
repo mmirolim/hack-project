@@ -157,3 +157,10 @@ func todayOrder(c web.C, w http.ResponseWriter, r *http.Request) {
 	}
 	fmt.Fprintf(w, string(ordersJSON))
 }
+
+func statusOrder(c web.C, w http.ResponseWriter, r *http.Request) {
+	status, err := strconv.Atoi(c.URLParams["id"])
+	panicOnErr(err)
+	var order Order
+	orders, err := order.FindAll(ds.Where{Field: "status", Crit: "=", Value: kk
+}
