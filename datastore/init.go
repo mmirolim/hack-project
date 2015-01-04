@@ -58,7 +58,8 @@ func Initialize(ds conf.Datastore) (*sql.DB, error) {
 	var item Item
 	var staff Staff
 	var nots Nots
-	err = createTable([]Model{&order, &table, &item, &staff, &nots})
+	var cats Cat
+	err = createTable([]Model{&order, &table, &item, &staff, &nots, &cats})
 	if err != nil {
 		return nil, err
 	}
