@@ -5,6 +5,7 @@ import "time"
 type Nots struct {
 	ID        int       `db:"id" json:"id"`
 	TableID   int       `db:"tableID" json:"tableID"`
+	OrderID   int       `db:"orderID" json:"orderID"`
 	Msg       string    `db:"msg" json:"msg"`
 	StaffID   int       `db:"staffID" json:"staffID"`
 	Status    int       `db:"status" json:"status"`
@@ -22,7 +23,7 @@ func (n Nots) GetID() int {
 }
 
 func (n Nots) FieldNames() []string {
-	return []string{"tableID", "msg", "staffID", "status", "createdAt", "updatedAt"}
+	return []string{"tableID", "orderID", "msg", "staffID", "status", "createdAt", "updatedAt"}
 }
 
 // create table query
@@ -31,6 +32,7 @@ func (n Nots) createTableQuery() string {
 	q += ` ( 
 		id INTEGER PRIMARY	KEY AUTOINCREMENT, 
 		tableID INTEGER, 
+                orderID INEGER,
 		msg TEXT,
                 staffID INTEGER, 
                 status INTEGER,
@@ -56,6 +58,7 @@ func (n Nots) Validate() error {
 func (n *Nots) Create() error {
 	err := create(n,
 		n.TableID,
+		n.OrderID,
 		n.Msg,
 		n.StaffID,
 		n.Status,
@@ -69,6 +72,7 @@ func (n *Nots) FindOne(wh Where) error {
 	var createdAt, updatedAt int64
 	err := findOne(n, wh, &n.ID,
 		&n.TableID,
+		&n.OrderID,
 		&n.Msg,
 		&n.StaffID,
 		&n.Status,
@@ -96,6 +100,7 @@ func (n *Nots) FindAll(wh Where, lim int) ([]Nots, error) {
 		err := rows.Scan(
 			&nt.ID,
 			&nt.TableID,
+			&nt.OrderID,
 			&nt.Msg,
 			&nt.StaffID,
 			&nt.Status,
@@ -115,6 +120,7 @@ func (n *Nots) FindAll(wh Where, lim int) ([]Nots, error) {
 func (n *Nots) Update() error {
 	err := update(n,
 		n.TableID,
+		n.OrderID,
 		n.Msg,
 		n.StaffID,
 		n.Status,
