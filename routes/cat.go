@@ -15,6 +15,7 @@ func getCatAll(c web.C, w http.ResponseWriter, r *http.Request) {
 	var err error
 	sts, err := st.FindAll(ds.Where{"id", ">", 0}, 0)
 	panicOnErr(err)
+
 	jsn, err := json.Marshal(sts)
 	fmt.Fprintf(w, string(jsn))
 }
@@ -22,6 +23,7 @@ func getCatAll(c web.C, w http.ResponseWriter, r *http.Request) {
 func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(c.URLParams["id"])
 	panicOnErr(err)
+
 	var cat ds.Cat
 	err = cat.FindOne(ds.Where{"id", "=", id})
 	panicOnErr(err)
@@ -44,20 +46,21 @@ func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(c.URLParams["id"])
 	panicOnErr(err)
+
 	var oldCat, cat ds.Cat
 	err = oldCat.FindOne(ds.Where{"id", "=", id})
 	panicOnErr(err)
-	if err != nil {
-		panic(err)
-	}
 
 	err = json.NewDecoder(r.Body).Decode(&cat)
 	panicOnErr(err)
+
 	cat.ID = id
 	err = cat.Update()
 	panicOnErr(err)
+
 	orderJSON, _ := json.Marshal(&cat)
 	panicOnErr(err)
+
 	fmt.Fprintf(w, string(orderJSON))
 }
 
@@ -66,8 +69,10 @@ func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	var cat ds.Cat
 	err = cat.FindOne(ds.Where{"id", "=", id})
 	panicOnErr(err)
+
 	err = cat.Delete()
 	panicOnErr(err)
+
 	w.Header().Set("Content-Type", "text/json")
 	if err != nil {
 		panic(err)
