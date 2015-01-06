@@ -57,7 +57,7 @@ func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	fmt.Printf("%+v\n", st)
 	err = st.Create()
 	if err != nil {
-		res := "{'result': 'failure'}"
+		res := "{'result': 'success'}"
 		result, err := json.Marshal(res)
 		fmt.Fprintf(w, string(result))
 		panic(err)
