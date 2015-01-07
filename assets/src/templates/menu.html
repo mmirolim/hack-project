@@ -1,0 +1,39 @@
+<div class="orders" ng-controller='MenuController'>
+	<div class='col-xs-12 block'>
+		
+		<input class='form-control' ng-model='search' placeholder='Search'>
+
+	</div>	
+	<pre>{{getOrders()}}</pre>
+	<div class="col-xs-12 menu-item" ng-repeat='meal in menu | filter:search'>
+
+		<div class='card clearfix'> 
+			
+			<div class="col-xs-4">
+				<img src="{{meal.image}}" class='img-responsive'>
+			</div>	
+			<div class='col-xs-2'>
+				{{meal.name}}
+			</div>	
+			<div class='col-xs-3'>
+				<span ng-hide='meal.quantity'>{{meal.cost}} sum</span>
+				<span ng-show='meal.quantity'>{{meal.cost * meal.quantity}} sum</span>
+			</div>		
+			<div class='col-xs-1'>
+				{{meal.quantity}}
+			</div>									
+			<div class='col-xs-2 text-right'>
+				<div class='btn-group'>	
+					<button class='btn btn-sm btn-info' ng-click="plus( meal )">
+						<i class='fa fa-plus'></i>					
+					</button>
+					<button class='btn btn-sm btn-info' ng-click="minus(meal)">
+						<i class='fa fa-minus'></i>					
+					</button>
+				</div>
+			</div>
+
+		</div>
+	</div>	
+
+</div>

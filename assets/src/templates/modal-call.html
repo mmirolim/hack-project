@@ -1,0 +1,21 @@
+<div class="modal" ui-if='modal1' ui-state='modal1'>
+  <div class="modal-backdrop in"></div>
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+      <div class="modal-header">
+        <button class="close" 
+                ui-turn-off="modal1">&times;</button>
+        <h4 class="modal-title">Call Waiter</h4>
+      </div>
+
+      <div class="modal-body">
+        <input type='text' class='form-control' placeholder='Cause of calling waiter'><br>
+        <div class='text-center'>
+          <button ui-turn-off="modal1" class="btn btn-info">Call</button>  
+        </div>        
+      </div>
+              
+    </div>
+  </div>
+</div>
