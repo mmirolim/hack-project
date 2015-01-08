@@ -1,12 +1,18 @@
 package routes
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/zenazn/goji/web"
 
 	ds "github.com/mmirolim/hack-project/datastore"
 )
+
+type opStat struct {
+	Status string `json:"status"`
+}
 
 func Initialize(status <-chan ds.Status) *web.Mux {
 	// WARNING more specific routes should be first then more general
@@ -37,11 +43,19 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Put("/staff/:id", updateStaff)
 
 	//categories
-	m.Get("/categories", getCatAll)
+	m.Get("/categories", getCatsAll)
 	m.Get("/categories/:id", getCat)
 	m.Post("/categories", createCat)
 	m.Put("/categories/:id", updateCat)
 	m.Delete("/categories/:id", deleteCat)
+
+	//items
+	m.Get("/items", getItemsAll)
+	m.Get("/items/:id", getItem)
+	m.Post("/items", createItem)
+	m.Put("/items/:id", updateItem)
+	m.Delete("/items/:id", deleteItem)
+
 	// notifications
 	m.Get("/notifications/tables/:alias", getTableNots)
 	return m
@@ -60,4 +74,21 @@ func JSON(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
+}
+
+func sendRes(w http.ResponseWriter, err error, object []byte) {
+	if err != nil {
+		fmt.Printf("%+v\n", err)
+		r, err := json.Marshal(opStat{"failure"})
+		panicOnErr(err)
+		fmt.Fprintf(w, string(r))
+	} else {
+		if len(object) == 0 {
+			r, err := json.Marshal(opStat{"success"})
+			panicOnErr(err)
+			fmt.Fprintf(w, string(r))
+		} else {
+			fmt.Fprintf(w, string(object))
+		}
+	}
 }
