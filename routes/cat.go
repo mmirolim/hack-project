@@ -2,7 +2,6 @@ package routes
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strconv"
 
@@ -10,21 +9,15 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-func getCatAll(c web.C, w http.ResponseWriter, r *http.Request) {
+func getCatsAll(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Cat
 	var err error
+
 	sts, err := st.FindAll(ds.Where{"id", ">", 0}, 0)
 	panicOnErr(err)
 
 	catsJSON, err := json.Marshal(sts)
-	if err != nil {
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		fmt.Fprintf(w, string(result))
-		panicOnErr(err)
-	} else {
-		fmt.Fprintf(w, string(catsJSON))
-	}
+	sendRes(w, err, catsJSON)
 }
 
 func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -36,37 +29,15 @@ func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	panicOnErr(err)
 
 	catJSON, err := json.Marshal(cat)
-
-	w.Header().Set("Content-Type", "text/json")
-
-	if err != nil {
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		panicOnErr(err)
-		fmt.Fprintf(w, string(result))
-		panic(err)
-	} else {
-		fmt.Fprintf(w, string(catJSON))
-	}
+	sendRes(w, err, catJSON)
 }
 
 func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Cat
 	err := json.NewDecoder(r.Body).Decode(&st)
 	panicOnErr(err)
-	fmt.Printf("%+v\n", st)
 	err = st.Create()
-	if err != nil {
-		res := "{'result': 'success'}"
-		result, err := json.Marshal(res)
-		fmt.Fprintf(w, string(result))
-		panic(err)
-	} else {
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		panicOnErr(err)
-		fmt.Fprintf(w, string(result))
-	}
+	sendRes(w, err, nil)
 }
 
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -85,17 +56,7 @@ func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	panicOnErr(err)
 
 	orderJSON, err := json.Marshal(&cat)
-	w.Header().Set("Content-Type", "text/json")
-
-	if err != nil {
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		panicOnErr(err)
-		fmt.Fprintf(w, string(result))
-		panic(err)
-	} else {
-		fmt.Fprintf(w, string(orderJSON))
-	}
+	sendRes(w, err, orderJSON)
 }
 
 func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -107,17 +68,5 @@ func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	err = cat.Delete()
 	panicOnErr(err)
 
-	w.Header().Set("Content-Type", "text/json")
-	if err != nil {
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		panicOnErr(err)
-		fmt.Fprintf(w, string(result))
-		panic(err)
-	} else {
-		res := "{'result': 'success'}"
-		result, err := json.Marshal(res)
-		panicOnErr(err)
-		fmt.Fprintf(w, string(result))
-	}
+	sendRes(w, err, nil)
 }
