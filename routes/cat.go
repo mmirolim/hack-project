@@ -34,11 +34,12 @@ func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
 func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Cat
 	err := json.NewDecoder(r.Body).Decode(&st)
-	panicOnErr(err)
-	fmt.Printf("%+v\n", st)
+	replyOnErr(w, 400, err)
+
 	err = st.Create()
-	panicOnErr(err)
-	fmt.Fprintf(w, "success")
+	replyOnErr(w, 500, err)
+
+	reply(w, 200, OK)
 }
 
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -49,17 +50,10 @@ func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(c.URLParams["id"])
 	var cat ds.Cat
 	err = cat.FindOne(ds.Where{"id", "=", id})
-	panicOnErr(err)
+	replyOnErr(w, 500, err)
+
 	err = cat.Delete()
-	panicOnErr(err)
-	w.Header().Set("Content-Type", "text/json")
-	if err != nil {
-		panic(err)
-		res := "{'result': 'failure'}"
-		result, err := json.Marshal(res)
-		if err != nil {
-			panic(err)
-		}
-		fmt.Fprintf(w, string(result))
-	}
+	replyOnErr(w, 500, err)
+
+	reply(w, 200, OK)
 }

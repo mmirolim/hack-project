@@ -12,7 +12,18 @@ import (
 	"github.com/zenazn/goji"
 )
 
+var (
+	mode = flag.String("mode", "dev", "debug, dev, prod")
+)
+
+func init() {
+	flag.Parse()
+	flag.Usage()
+}
+
 func main() {
+	// start logger
+	services.Initialize(*mode)
 	// read conf file
 	f, err := os.Open("conf.toml")
 	fatalOnError(err)
@@ -29,7 +40,7 @@ func main() {
 	// init routes
 	m := routes.Initialize(statusChan)
 	// set response format
-	//	goji.Use(routes.JSON)
+	goji.Use(routes.JSON)
 	// set goji server port
 	flag.Set("bind", App.Srv.IP+":"+App.Srv.Port)
 	// register routes

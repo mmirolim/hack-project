@@ -1,11 +1,19 @@
 package routes
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/zenazn/goji/web"
 
 	ds "github.com/mmirolim/hack-project/datastore"
+)
+
+const (
+	OK      = "OK"
+	SUCCESS = "SUCCESS"
+	FAILURE = "FAILURE"
 )
 
 func Initialize(status <-chan ds.Status) *web.Mux {
@@ -60,4 +68,34 @@ func JSON(h http.Handler) http.Handler {
 		h.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
+}
+
+type Reply struct {
+	StatusCode int    `json:"status"`
+	Msg        string `json:"msg"`
+}
+
+func (p *Reply) Set(status int, msg string) {
+	p.StatusCode = status
+	p.Msg = msg
+}
+
+// @todo refactor should be configurabe from header
+// now just json
+func reply(w http.ResponseWriter, status int, msg string) {
+	rep := Reply{status, msg}
+	var res string
+	b, err := json.Marshal(rep)
+	if err != nil {
+		res = err.Error()
+	} else {
+		res = string(b)
+	}
+	fmt.Fprintf(w, res)
+}
+
+func replyOnErr(w http.ResponseWriter, status int, err error) {
+	if err != nil {
+		reply(w, status, err.Error())
+	}
 }
