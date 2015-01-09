@@ -14,6 +14,7 @@ type Datastore struct {
 }
 
 type Server struct {
+	IP   string
 	Port string
 }
 
