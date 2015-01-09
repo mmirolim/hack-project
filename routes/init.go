@@ -82,20 +82,17 @@ func (p *Reply) Set(status int, msg string) {
 
 // @todo refactor should be configurabe from header
 // now just json
-func reply(w http.ResponseWriter, status int, msg string) {
-	rep := Reply{status, msg}
+func replyJson(w http.ResponseWriter, data interface{}) {
 	var res string
-	b, err := json.Marshal(rep)
+	b, err := json.Marshal(data)
 	if err != nil {
 		res = err.Error()
 	} else {
 		res = string(b)
 	}
-	fmt.Fprintf(w, res)
-}
-
-func replyOnErr(w http.ResponseWriter, status int, err error) {
-	if err != nil {
-		reply(w, status, err.Error())
+	switch v := data.(type) {
+	case Reply:
+		w.WriteHeader(v.StatusCode)
 	}
+	fmt.Fprintf(w, res)
 }

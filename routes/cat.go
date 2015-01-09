@@ -7,6 +7,7 @@ import (
 	"strconv"
 
 	ds "github.com/mmirolim/hack-project/datastore"
+	"github.com/mmirolim/hack-project/services"
 	"github.com/zenazn/goji/web"
 )
 
@@ -34,12 +35,20 @@ func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
 func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Cat
 	err := json.NewDecoder(r.Body).Decode(&st)
-	replyOnErr(w, 400, err)
+	if err != nil {
+		replyJson(w, Reply{400, err.Error()})
+		services.LogDeb(err)
+		return
+	}
 
 	err = st.Create()
-	replyOnErr(w, 500, err)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
 
-	reply(w, 200, OK)
+	replyJson(w, Reply{200, OK})
+
 }
 
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -50,10 +59,15 @@ func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(c.URLParams["id"])
 	var cat ds.Cat
 	err = cat.FindOne(ds.Where{"id", "=", id})
-	replyOnErr(w, 500, err)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
 
 	err = cat.Delete()
-	replyOnErr(w, 500, err)
-
-	reply(w, 200, OK)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+	replyJson(w, Reply{200, OK})
 }
