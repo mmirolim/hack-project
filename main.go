@@ -8,7 +8,6 @@ import (
 	"github.com/mmirolim/hack-project/conf"
 	ds "github.com/mmirolim/hack-project/datastore"
 	"github.com/mmirolim/hack-project/routes"
-	"github.com/mmirolim/hack-project/services"
 	"github.com/zenazn/goji"
 )
 
@@ -22,8 +21,6 @@ func init() {
 }
 
 func main() {
-	// start logger
-	services.Initialize(*mode)
 	// read conf file
 	f, err := os.Open("conf.toml")
 	fatalOnError(err)
@@ -36,7 +33,6 @@ func main() {
 	fatalOnError(err)
 	// start status bot
 	statusChan := make(chan ds.Status)
-	go services.StartStatusBot(App.Rs, statusChan)
 	// init routes
 	m := routes.Initialize(statusChan)
 	// set response format
