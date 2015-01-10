@@ -64,6 +64,7 @@ func (it Item) Validate() error {
 
 //Create an order
 func (i *Item) Create() error {
+	i.SetDefaults()
 	err := create(i,
 		i.Name,
 		i.Desc,
@@ -139,6 +140,7 @@ func (i *Item) FindAll(wh Where, lim int) ([]Item, error) {
 }
 
 func (i *Item) Update() error {
+	i.UpdatedAt = time.Now()
 	err := update(i,
 		i.Name,
 		i.Desc,

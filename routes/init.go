@@ -11,9 +11,10 @@ import (
 )
 
 const (
-	OK      = "OK"
-	SUCCESS = "SUCCESS"
-	FAILURE = "FAILURE"
+	OK       = "OK"
+	SUCCESS  = "SUCCESS"
+	FAILURE  = "FAILURE"
+	NOTFOUND = "NOT FOUND"
 )
 
 func Initialize(status <-chan ds.Status) *web.Mux {
@@ -45,7 +46,7 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Put("/staff/:id", updateStaff)
 
 	//categories
-	m.Get("/categories", getCatAll)
+	m.Get("/categories", getCatsAll)
 	m.Get("/categories/:id", getCat)
 	m.Post("/categories", createCat)
 	m.Put("/categories/:id", updateCat)

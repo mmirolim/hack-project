@@ -11,25 +11,39 @@ import (
 	"github.com/zenazn/goji/web"
 )
 
-func getCatAll(c web.C, w http.ResponseWriter, r *http.Request) {
+func getCatsAll(c web.C, w http.ResponseWriter, r *http.Request) {
 	var st ds.Cat
-	var err error
 	sts, err := st.FindAll(ds.Where{"id", ">", 0}, 0)
-	panicOnErr(err)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+	}
 	jsn, err := json.Marshal(sts)
+	if err != nil {
+		replyJson(w, Reply{400, err.Error()})
+	}
 	fmt.Fprintf(w, string(jsn))
 }
 
 func getCat(c web.C, w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(c.URLParams["id"])
-	panicOnErr(err)
+	if err != nil {
+		replyJson(w, Reply{400, err.Error()})
+		return
+	}
+
 	var cat ds.Cat
 	err = cat.FindOne(ds.Where{"id", "=", id})
-	panicOnErr(err)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
 
-	catJSON, _ := json.Marshal(cat)
-
-	fmt.Fprintf(w, string(catJSON))
+	jsn, err := json.Marshal(cat)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+	fmt.Fprintf(w, string(jsn))
 }
 
 func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
@@ -52,7 +66,30 @@ func createCat(c web.C, w http.ResponseWriter, r *http.Request) {
 }
 
 func updateCat(c web.C, w http.ResponseWriter, r *http.Request) {
-	fmt.Fprintf(w, "Update user %s", c.URLParams["id"])
+	id, err := strconv.Atoi(c.URLParams["id"])
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+	var oldCat, cat ds.Cat
+	err = oldCat.FindOne(ds.Where{"id", "=", id})
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+	cat.ID = id
+	err = cat.Update()
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+	jsn, err := json.Marshal(&cat)
+	if err != nil {
+		replyJson(w, Reply{500, err.Error()})
+		return
+	}
+
+	fmt.Fprintf(w, string(jsn))
 }
 
 func deleteCat(c web.C, w http.ResponseWriter, r *http.Request) {
