@@ -51,6 +51,13 @@ func Initialize(status <-chan ds.Status) *web.Mux {
 	m.Post("/categories", createCat)
 	m.Put("/categories/:id", updateCat)
 	m.Delete("/categories/:id", deleteCat)
+
+	//items
+	m.Get("/items", getItemsAll)
+	m.Get("/items/:id", getItem)
+	m.Post("/items", createItem)
+	m.Put("/items/:id", updateItem)
+	m.Delete("/items/:id", deleteItem)
 	// notifications
 	m.Get("/notifications/tables/:alias", getTableNots)
 	return m
