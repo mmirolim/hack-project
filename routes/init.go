@@ -77,8 +77,6 @@ func JSON(h http.Handler) http.Handler {
 		// @TODO temp fix to content type
 		if !strings.Contains(url, "/assets/") {
 			w.Header().Set("Content-Type", "application/json")
-		} else {
-			w.Header().Set("Content-Type", "text/html")
 		}
 		h.ServeHTTP(w, r)
 	}
