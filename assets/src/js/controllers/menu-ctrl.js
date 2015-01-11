@@ -13,7 +13,7 @@ function MenuController( $scope, localStorageService, $STATUS, Menu, $routeParam
         $scope.ordersClass = 'active';
 
         if( !_.findWhere( $scope.orders ,{ id: meal.id } ) )
-            $scope.orders.push( meal );
+            $scope.orders.push( meal );        
 
         meal.quantity += 1;
     };

@@ -41,6 +41,10 @@ angular.module('Rest')
     .when('/admin/category', {
         templateUrl: 'templates/admin/category.html',
         controller: 'AdminCategoryController'
+    })
+    .when('/admin/item', {
+        templateUrl: 'templates/admin/item.html',
+        controller: 'AdminItemController'
     });
 
 });

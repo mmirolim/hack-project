@@ -19,7 +19,7 @@ function AdminCategoryController( $scope, $http ) {
 	      });
     };	
     
-     function getCategories(){
+    function getCategories(){
     	$http.get('/categories').
 	      success(function(data, status, headers, config) {
 	        $scope.categories = data;

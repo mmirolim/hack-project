@@ -3,11 +3,11 @@
  */
 
 angular.module('Rest')
-    .controller('MasterController', [ '$scope', 'localStorageService', 'Menu',  MasterController ] );
+    .controller('MasterController', [ '$scope', 'localStorageService', '$http',  MasterController ] );
 
-function MasterController( $scope, localStorageService, Menu ) {                   
+function MasterController( $scope, localStorageService, $http ) {              
 
-    $scope.modalCall = false;    
+    $scope.modalCall = false;
 
     $scope.getTotalCost = function( meal ){ 
 
@@ -21,7 +21,7 @@ function MasterController( $scope, localStorageService, Menu ) {
     };
     
     $scope.getOrders = function(){
-        return localStorageService.get('orders') || [];
+        return localStorageService.get('orders') || [];            
     };
 
     $scope.ordersClass = '';
@@ -37,12 +37,19 @@ function MasterController( $scope, localStorageService, Menu ) {
     }; 
 
     $scope.getByCategory = function( catId ){
-        return _.where( $scope.items, { catId: +catId });
+        return _.where( $scope.items, { catID: +catId });
     };
 
-    $scope.percentService = 10;
+    $scope.getItems = function(){
+        $http.get('/items').
+          success(function( data, status, headers, config) {
+            $scope.items = _.map( data, function(obj){ obj.quantity = 0; return obj });
+          });
+    }
 
-    $scope.items = Menu.getMenu();       
+    $scope.getItems();
+
+    $scope.percentService = 10;
 
     $scope.alerts = [];
 

@@ -3,19 +3,26 @@ angular.module('Rest')
 
 function CategoryService( $http )
 {	
-	var getCategories = function() {	
-		return [{					
-	        id: 1,
-	        name: "Meals",	        
-	      },{					
-	        id: 2,
-	        name: "Drinks",	        
-	      }];
-	};
+	// function getItems(){
+ //    	$http.get('/items').
+	//       success(function(data, status, headers, config) {
+	//         $scope.items = data;
+	//       });
+ //    }
 
-	return {
-		getCategories: function() {
-			return getCategories();
-		}
-	};
+	// var getCategories = function() {	
+	// 	return [{					
+	//         id: 1,
+	//         name: "Meals",	        
+	//       },{					
+	//         id: 2,
+	//         name: "Drinks",	        
+	//       }];
+	// };
+
+	// return {
+	// 	getCategories: function() {
+	// 		return getCategories();
+	// 	}
+	// };
 };

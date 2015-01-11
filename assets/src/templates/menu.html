@@ -3,26 +3,25 @@
 		
 		<input class='form-control' ng-model='search' placeholder='Search'>
 
-	</div>	
-	<pre>{{getOrders()}}</pre>
+	</div>
 	<div class="col-xs-12 menu-item" ng-repeat='meal in menu | filter:search'>
 
 		<div class='card clearfix'> 
 			
-			<div class="col-xs-4">
+			<div class="col-xs-12 col-sm-4 text-center image">
 				<img src="{{meal.image}}" class='img-responsive'>
 			</div>	
-			<div class='col-xs-2'>
-				{{meal.name}}
+			<div class='col-xs-12 col-sm-4 item-name'>
+				<h3>{{meal.name}}</h3>
 			</div>	
-			<div class='col-xs-3'>
-				<span ng-hide='meal.quantity'>{{meal.cost}} sum</span>
-				<span ng-show='meal.quantity'>{{meal.cost * meal.quantity}} sum</span>
+			<div class='col-xs-4 col-sm-4'>
+				<span ng-hide='meal.quantity'><span class='label label-danger'>{{meal.cost}}</span></span>
+				<span ng-show='meal.quantity'><span class='label label-danger'>{{meal.cost * meal.quantity}}</span></span>
 			</div>		
-			<div class='col-xs-1'>
+			<div class='col-xs-4 col-sm-4'>
 				{{meal.quantity}}
 			</div>									
-			<div class='col-xs-2 text-right'>
+			<div class='col-xs-4 col-sm-4'>
 				<div class='btn-group'>	
 					<button class='btn btn-sm btn-info' ng-click="plus( meal )">
 						<i class='fa fa-plus'></i>					
