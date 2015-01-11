@@ -2,7 +2,6 @@ package datastore
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"strconv"
 	"strings"
@@ -123,8 +122,12 @@ func findOne(m Model, wh Where, args ...interface{}) error {
 	fld, crit, val := wh.trimSpace()
 	q := "SELECT *  FROM " + m.TableName() + " WHERE " + fld + crit + "? LIMIT 1"
 	// write data to dest
-	fmt.Printf("%+v\n", q)
 	err = DB.QueryRow(q, val).Scan(args...)
+	return err
+}
+
+func findById(m Model, id interface{}, args ...interface{}) error {
+	err := findOne(m, Where{"id", "=", id}, args...)
 	return err
 }
 
