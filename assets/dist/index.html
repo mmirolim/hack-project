@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en" ng-app="Rest" >
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+
+	<title>Restaurant</title>
+  <!-- STYLES -->
+  <link rel="stylesheet" href="lib/css/main.min.css"/>
+  <link rel="stylesheet" type="text/css" href="css/app.css" />
+  <!-- SCRIPTS -->
+  <script src="lib/js/main.min.js"></script>
+  <!-- Custom Scripts -->
+  <script type="text/javascript" src="js/dashboard.min.js"></script>
+</head>
+<body ng-controller='MasterController'>
+
+    <!-- Sidebars -->
+    <div class="sidebar sidebar-left" ng-include="'templates/sidebar-left.html'"></div>
+
+    <div class="sidebar sidebar-right" ng-include="'templates/sidebar-right.html'"></div>
+
+    <div class="app">
+
+      <!-- Top Navbar -->
+      <div class="navbar navbar-app navbar-absolute-top">
+
+        <div class="navbar-brand navbar-brand-center">
+          Restaurant
+        </div>
+
+        <div class="btn-group pull-left">
+          <div class="btn btn-navbar sidebar-toggle" ui-toggle="uiSidebarLeft">
+              <i class="fa fa-bars"></i> Menu
+          </div>
+        </div>
+
+        <div class="btn-group pull-right">
+
+          <div class="btn btn-navbar">            
+            <a ui-turn-on="modal1" class='btn'>
+              <i class="fa fa-bell"></i>
+            </a>            
+          </div>
+
+          <div class="btn btn-navbar sidebar-toggle cart" ui-toggle='uiSidebarRight'>
+            <i class="fa fa-shopping-cart"></i>
+          </div>
+
+        </div>
+
+      </div>
+      <!-- /Top Navbar -->
+
+      <!-- App body -->
+
+      <div class='app-body'>
+        <div class='app-content'>
+
+          <div class="scrollable">
+            <div class="scrollable-content">
+              
+              <ng-view></ng-view>
+
+            </div>
+          </div>
+          
+        </div>
+      </div>
+    </div><!-- ~ .app -->
+
+    
+    <div ng-include="'templates/modal-call.html'"></div>
+    
+
+    <div ui-yield-to="modals"></div>
+
+</body>
+</html>
