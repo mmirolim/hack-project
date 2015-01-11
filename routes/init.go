@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/zenazn/goji/web"
 
@@ -72,7 +73,13 @@ func panicOnErr(err error) {
 // set response to json format
 func JSON(h http.Handler) http.Handler {
 	fn := func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Content-Type", "application/json")
+		url := fmt.Sprintf("%s", r.URL)
+		// @TODO temp fix to content type
+		if !strings.Contains(url, "/assets/") {
+			w.Header().Set("Content-Type", "application/json")
+		} else {
+			w.Header().Set("Content-Type", "text/html")
+		}
 		h.ServeHTTP(w, r)
 	}
 	return http.HandlerFunc(fn)
