@@ -8,3 +8,5 @@ req.sh
 *.db
 >>>>>>> add-models
 *.test
+assets/node_modules
+assets/src/bower_components
